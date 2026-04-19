@@ -16,8 +16,11 @@ export function createApplication() {
     return res.status(200).json({
       issuer: process.env.AUTH_BASE_URL || "http://localhost:8080",
       authorization_endpoint:
-        `${process.env.AUTH_BASE_URL}/auth/login` ||
-        "http://localhost:8080/auth/login",
+        `${process.env.AUTH_BASE_URL}/auth/authenticate` ||
+        "http://localhost:8080/auth/authenticate",
+      userinfo_endpoint:
+        `${process.env.AUTH_BASE_URL}/auth/userinfo` ||
+        "http://localhost:8080/auth/userinfo",
       jwks_uri:
         `${process.env.AUTH_BASE_URL}/certs` ||
         "http://localhost:8080/auth/certs",

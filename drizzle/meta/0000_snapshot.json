@@ -1,5 +1,5 @@
 {
-  "id": "9263c4a8-6de7-4137-9f63-d017760c46b6",
+  "id": "bbb086ba-5a58-4c28-8799-01e182221247",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -30,6 +30,12 @@
         "client_secret": {
           "name": "client_secret",
           "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "application_url": {
+          "name": "application_url",
+          "type": "text",
           "primaryKey": false,
           "notNull": true
         },

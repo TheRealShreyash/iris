@@ -6,7 +6,8 @@
     "dev": "bun --watch src/server.ts",
     "studio": "drizzle-kit studio",
     "db:generate": "drizzle-kit generate",
-    "db:migrate": "drizzle-kit migrate"
+    "db:migrate": "drizzle-kit migrate",
+    "db:push": "drizzle-kit push"
   },
   "devDependencies": {
     "@types/bun": "latest",
@@ -26,6 +27,7 @@
     "express": "^5.2.1",
     "jose": "^6.2.2",
     "jsonwebtoken": "^9.0.3",
-    "pg": "^8.20.0"
+    "pg": "^8.20.0",
+    "uuid": "^14.0.0"
   }
 }

@@ -3,6 +3,7 @@ CREATE TABLE "clients" (
 	"name" varchar(100) NOT NULL,
 	"client_id" varchar(100) NOT NULL,
 	"client_secret" varchar(100) NOT NULL,
+	"application_url" text NOT NULL,
 	"redirect_uri" text NOT NULL,
 	CONSTRAINT "clients_client_id_unique" UNIQUE("client_id"),
 	CONSTRAINT "clients_client_secret_unique" UNIQUE("client_secret")

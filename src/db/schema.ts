@@ -12,7 +12,8 @@ export const clientsTable = pgTable("clients", {
   name: varchar("name", { length: 100 }).notNull(),
   clientId: varchar("client_id", { length: 100 }).notNull().unique(),
   clientSecret: varchar("client_secret", { length: 100 }).notNull().unique(),
-  redirect_uri: text("redirect_uri").notNull(),
+  applicationUrl: text("application_url").notNull(),
+  redirectUri: text("redirect_uri").notNull(),
 });
 
 export const usersTable = pgTable("users", {
