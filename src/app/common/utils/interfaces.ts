@@ -1,16 +1,13 @@
-import type { Request } from "express";
-
 export interface UserTokenPayload {
-  id: string;
-}
-
-export interface EmailVerificationPayload {
+  iss: string;
+  sub: string;
   email: string;
-}
-
-export interface AuthenticatedRequest extends Request {
-  user?: UserTokenPayload;
-  cookies: Record<string, string>;
+  emailVerified: string;
+  exp: number;
+  family_name?: string;
+  given_name?: string;
+  name?: string;
+  picture?: string;
 }
 
 export interface ClientPayload {
