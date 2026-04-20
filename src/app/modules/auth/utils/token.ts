@@ -1,7 +1,7 @@
 import JWT from "jsonwebtoken";
 import { readFileSync } from "node:fs";
-import type { UserTokenPayload } from "../../../common/utils/interfaces";
 import { createHash } from "node:crypto";
+import type { UserTokenPayload } from "../auth.models";
 
 const privateKey = readFileSync(process.env.PRIVATE_KEY_PATH!, "utf-8");
 const publicKey = readFileSync(process.env.PUBLIC_KEY_PATH!, "utf-8");

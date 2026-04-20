@@ -1,0 +1,606 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sign In — Iris</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Instrument+Sans:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg: #0a0a0a;
+        --surface: rgba(255, 255, 255, 0.04);
+        --border: rgba(255, 255, 255, 0.09);
+        --borderhi: rgba(255, 255, 255, 0.22);
+        --text: #f0f0f0;
+        --muted: #666;
+        --input-bg: rgba(255, 255, 255, 0.03);
+      }
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        min-height: 100vh;
+        font-family: "Instrument Sans", sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        display: flex;
+        position: relative;
+        overflow: hidden;
+      }
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        z-index: 0;
+        background:
+          radial-gradient(
+            ellipse 80% 60% at 0% 50%,
+            rgba(255, 255, 255, 0.025) 0%,
+            transparent 55%
+          ),
+          radial-gradient(
+            ellipse 50% 40% at 100% 50%,
+            rgba(255, 255, 255, 0.02) 0%,
+            transparent 55%
+          );
+        pointer-events: none;
+      }
+      body::after {
+        content: "";
+        position: fixed;
+        inset: 0;
+        z-index: 0;
+        background-image:
+          linear-gradient(rgba(255, 255, 255, 0.022) 1px, transparent 1px),
+          linear-gradient(
+            90deg,
+            rgba(255, 255, 255, 0.022) 1px,
+            transparent 1px
+          );
+        background-size: 80px 80px;
+        pointer-events: none;
+      }
+
+      /* ---- Left panel ---- */
+      .left {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        padding: 5rem 5rem 5rem 6rem;
+        position: relative;
+        z-index: 1;
+        border-right: 1px solid var(--border);
+      }
+
+      .left-brand {
+        margin-bottom: 4.5rem;
+      }
+      .left-brand-name {
+        font-family: "Cormorant Garamond", serif;
+        font-weight: 300;
+        font-size: 1.7rem;
+        letter-spacing: 0.3em;
+        text-transform: uppercase;
+        color: #fff;
+      }
+      .left-brand-sub {
+        margin-top: 0.2rem;
+        font-size: 0.62rem;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: var(--muted);
+      }
+
+      .left-heading {
+        font-family: "Cormorant Garamond", serif;
+        font-weight: 300;
+        font-size: 3.6rem;
+        line-height: 1.05;
+        letter-spacing: -0.02em;
+        color: rgba(255, 255, 255, 0.88);
+        margin-bottom: 1.5rem;
+      }
+      .left-heading em {
+        font-style: italic;
+        color: rgba(255, 255, 255, 0.45);
+      }
+
+      .left-desc {
+        font-size: 0.85rem;
+        color: var(--muted);
+        line-height: 1.75;
+        max-width: 340px;
+        margin-bottom: 3rem;
+      }
+
+      .left-features {
+        list-style: none;
+        display: flex;
+        flex-direction: column;
+        gap: 0.85rem;
+      }
+      .left-features li {
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+        font-size: 0.8rem;
+        color: rgba(255, 255, 255, 0.3);
+      }
+      .feat-line {
+        width: 20px;
+        height: 1px;
+        background: rgba(255, 255, 255, 0.18);
+        flex-shrink: 0;
+      }
+
+      /* ---- Right panel ---- */
+      .right {
+        width: 480px;
+        flex-shrink: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 3rem 3.5rem;
+        position: relative;
+        z-index: 1;
+      }
+
+      .form-wrap {
+        width: 100%;
+        animation: rise 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+      }
+      @keyframes rise {
+        from {
+          opacity: 0;
+          transform: translateY(14px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      /* App requesting */
+      .app-banner {
+        border: 1px solid var(--border);
+        border-radius: 2px;
+        padding: 0.8rem 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+        margin-bottom: 2.2rem;
+        background: rgba(255, 255, 255, 0.025);
+      }
+      .app-mono {
+        width: 32px;
+        height: 32px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 1px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: "Cormorant Garamond", serif;
+        font-size: 0.95rem;
+        color: rgba(255, 255, 255, 0.5);
+        flex-shrink: 0;
+      }
+      .app-banner-info p {
+        font-size: 0.68rem;
+        color: var(--muted);
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+      }
+      .app-banner-info strong {
+        font-size: 0.84rem;
+        color: var(--text);
+        font-weight: 600;
+      }
+
+      .form-head {
+        margin-bottom: 1.8rem;
+      }
+      .eyebrow {
+        font-size: 0.63rem;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: var(--muted);
+        margin-bottom: 0.55rem;
+        font-weight: 500;
+      }
+      .form-head h2 {
+        font-family: "Cormorant Garamond", serif;
+        font-weight: 400;
+        font-size: 1.75rem;
+        color: #fff;
+        letter-spacing: -0.01em;
+      }
+      .form-head h2 em {
+        font-style: italic;
+        font-weight: 300;
+      }
+
+      /* Social */
+      .social-row {
+        display: flex;
+        gap: 0.5rem;
+        margin-bottom: 1.5rem;
+      }
+      .social-btn {
+        flex: 1;
+        padding: 0.65rem 0.5rem;
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid var(--border);
+        border-radius: 2px;
+        color: var(--muted);
+        font-family: "Instrument Sans", sans-serif;
+        font-size: 0.75rem;
+        font-weight: 500;
+        letter-spacing: 0.05em;
+        cursor: pointer;
+        transition:
+          border-color 0.15s,
+          color 0.15s,
+          background 0.15s;
+        text-align: center;
+      }
+      .social-btn:hover {
+        border-color: rgba(255, 255, 255, 0.2);
+        color: var(--text);
+        background: rgba(255, 255, 255, 0.06);
+      }
+
+      .or-divider {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin: 1.3rem 0;
+        font-size: 0.67rem;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: rgba(255, 255, 255, 0.18);
+      }
+      .or-divider::before,
+      .or-divider::after {
+        content: "";
+        flex: 1;
+        height: 1px;
+        background: var(--border);
+      }
+
+      .field {
+        margin-bottom: 1.1rem;
+      }
+      .field-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        margin-bottom: 0.4rem;
+      }
+      .field-top label {
+        font-size: 0.66rem;
+        letter-spacing: 0.13em;
+        text-transform: uppercase;
+        color: var(--muted);
+        font-weight: 500;
+      }
+      .field-top a {
+        font-size: 0.68rem;
+        color: rgba(255, 255, 255, 0.3);
+        text-decoration: none;
+        transition: color 0.15s;
+        letter-spacing: 0.04em;
+      }
+      .field-top a:hover {
+        color: rgba(255, 255, 255, 0.65);
+      }
+      .pw-wrap {
+        position: relative;
+      }
+      .pw-toggle {
+        position: absolute;
+        right: 0.85rem;
+        top: 50%;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        color: rgba(255, 255, 255, 0.25);
+        font-family: "Instrument Sans", sans-serif;
+        font-size: 0.7rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        cursor: pointer;
+        transition: color 0.15s;
+        padding: 0;
+      }
+      .pw-toggle:hover {
+        color: rgba(255, 255, 255, 0.55);
+      }
+      input[type="email"],
+      input[type="password"],
+      input[type="text"] {
+        width: 100%;
+        background: var(--input-bg);
+        border: 1px solid var(--border);
+        border-radius: 2px;
+        padding: 0.72rem 0.9rem;
+        color: var(--text);
+        font-family: "Instrument Sans", sans-serif;
+        font-size: 0.86rem;
+        outline: none;
+        transition:
+          border-color 0.18s,
+          background 0.18s,
+          box-shadow 0.18s;
+      }
+      input::placeholder {
+        color: rgba(255, 255, 255, 0.16);
+      }
+      input:focus {
+        border-color: var(--borderhi);
+        background: rgba(255, 255, 255, 0.05);
+        box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.04);
+      }
+
+      /* Remember */
+      .remember-row {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 1.5rem;
+        cursor: pointer;
+        user-select: none;
+      }
+      .remember-row input {
+        display: none;
+      }
+      .chk {
+        width: 14px;
+        height: 14px;
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        border-radius: 1px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.55rem;
+        color: #0a0a0a;
+        transition:
+          background 0.15s,
+          border-color 0.15s;
+        flex-shrink: 0;
+      }
+      .chk.checked {
+        background: rgba(255, 255, 255, 0.75);
+        border-color: rgba(255, 255, 255, 0.75);
+      }
+      .remember-label {
+        font-size: 0.76rem;
+        color: rgba(255, 255, 255, 0.3);
+      }
+
+      .btn {
+        width: 100%;
+        padding: 0.88rem;
+        background: #fff;
+        border: none;
+        border-radius: 2px;
+        color: #0a0a0a;
+        font-family: "Instrument Sans", sans-serif;
+        font-weight: 600;
+        font-size: 0.78rem;
+        letter-spacing: 0.13em;
+        text-transform: uppercase;
+        cursor: pointer;
+        transition:
+          background 0.18s,
+          transform 0.12s,
+          box-shadow 0.18s;
+      }
+      .btn:hover {
+        background: #e6e6e6;
+        transform: translateY(-1px);
+        box-shadow: 0 10px 28px rgba(0, 0, 0, 0.45);
+      }
+      .btn:active {
+        transform: translateY(0);
+      }
+
+      /* Scope consent */
+      .scope-consent {
+        margin-top: 1.4rem;
+        border: 1px solid var(--border);
+        border-radius: 2px;
+        padding: 0.85rem 0.95rem;
+        background: rgba(255, 255, 255, 0.02);
+      }
+      .scope-consent p {
+        font-size: 0.68rem;
+        color: rgba(255, 255, 255, 0.25);
+        letter-spacing: 0.05em;
+        margin-bottom: 0.55rem;
+        text-transform: uppercase;
+      }
+      .scope-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.4rem;
+      }
+      .scope-tag {
+        font-size: 0.68rem;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 1px;
+        padding: 0.18rem 0.55rem;
+        color: rgba(255, 255, 255, 0.3);
+        letter-spacing: 0.04em;
+      }
+
+      .foot {
+        margin-top: 1.4rem;
+        text-align: center;
+        font-size: 0.72rem;
+        color: rgba(255, 255, 255, 0.2);
+      }
+      .foot a {
+        color: rgba(255, 255, 255, 0.38);
+        text-decoration: none;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        transition: color 0.15s;
+      }
+      .foot a:hover {
+        color: rgba(255, 255, 255, 0.65);
+      }
+
+      @media (max-width: 860px) {
+        .left {
+          display: none;
+        }
+        .right {
+          width: 100%;
+          padding: 3rem 2rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Left -->
+    <div class="left">
+      <div class="left-brand">
+        <div class="left-brand-name">Iris</div>
+        <div class="left-brand-sub">Identity &amp; Access Platform</div>
+      </div>
+      <h1 class="left-heading">One identity.<br /><em>Every service.</em></h1>
+      <p class="left-desc">
+        Iris provides secure, standards-compliant authentication with OAuth 2.0
+        and OpenID Connect — built for teams who prioritise trust and clarity.
+      </p>
+      <ul class="left-features">
+        <li>
+          <span class="feat-line"></span>PKCE-enhanced Authorization Code Flow
+        </li>
+        <li>
+          <span class="feat-line"></span>Tokens issued in under 50ms globally
+        </li>
+        <li>
+          <span class="feat-line"></span>Multi-tenant &amp; multi-region by
+          default
+        </li>
+        <li><span class="feat-line"></span>SOC 2 Type II certified</li>
+      </ul>
+    </div>
+
+    <!-- Right -->
+    <div class="right">
+      <div class="form-wrap">
+        <div class="app-banner">
+          <div class="app-mono">A</div>
+          <div class="app-banner-info">
+            <p>Sign-in requested by</p>
+            <strong>Acme Dashboard</strong>
+          </div>
+        </div>
+
+        <div class="form-head">
+          <div class="eyebrow">Iris</div>
+          <h2>Welcome <em>back</em></h2>
+        </div>
+
+        <!-- <div class="social-row">
+          <button class="social-btn">Google</button>
+          <button class="social-btn">Apple</button>
+          <button class="social-btn">GitHub</button>
+        </div>
+
+        <div class="or-divider">or</div> -->
+
+        <form onsubmit="handleLogin(event)">
+          <div class="field">
+            <div class="field-top">
+              <label for="email">Email Address</label>
+            </div>
+            <input
+              type="email"
+              id="email"
+              placeholder="you@example.com"
+              required
+              autocomplete="email"
+            />
+          </div>
+
+          <div class="field">
+            <div class="field-top">
+              <label for="pw">Password</label>
+              <a href="#">Forgot password?</a>
+            </div>
+            <div class="pw-wrap">
+              <input
+                type="password"
+                id="pw"
+                placeholder="Enter your password"
+                required
+                autocomplete="current-password"
+              />
+              <button type="button" class="pw-toggle" onclick="togglePwd()">
+                Show
+              </button>
+            </div>
+          </div>
+
+          <label class="remember-row" onclick="toggleRemember(this)">
+            <input type="checkbox" />
+            <span class="chk" id="chk"></span>
+            <span class="remember-label">Keep me signed in</span>
+          </label>
+
+          <button type="submit" class="btn" id="loginBtn">Sign In</button>
+        </form>
+
+        <div class="scope-consent">
+          <p>This sign-in authorises access to</p>
+          <div class="scope-tags">
+            <span class="scope-tag">openid</span>
+            <span class="scope-tag">profile</span>
+            <span class="scope-tag">email</span>
+          </div>
+        </div>
+
+        <div class="foot">No account? <a href="signup.html">Create one</a></div>
+      </div>
+    </div>
+
+    <script>
+      function togglePwd() {
+        const inp = document.getElementById("pw");
+        const btn = inp.parentElement.querySelector(".pw-toggle");
+        inp.type = inp.type === "password" ? "text" : "password";
+        btn.textContent = inp.type === "password" ? "Show" : "Hide";
+      }
+      function toggleRemember(el) {
+        const cb = el.querySelector("input[type=checkbox]");
+        const chk = document.getElementById("chk");
+        const checked = !cb.checked;
+        chk.classList.toggle("checked", checked);
+        chk.textContent = checked ? "✓" : "";
+      }
+      function handleLogin(e) {
+        e.preventDefault();
+        const btn = document.getElementById("loginBtn");
+        btn.textContent = "Signing in...";
+        btn.style.opacity = "0.55";
+        btn.disabled = true;
+        setTimeout(() => {
+          btn.textContent = "Redirecting...";
+          btn.style.opacity = "1";
+          btn.style.background = "#d8d8d8";
+        }, 1300);
+      }
+    </script>
+  </body>
+</html>

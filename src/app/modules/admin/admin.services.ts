@@ -2,10 +2,10 @@ import { eq } from "drizzle-orm";
 import { db } from "../../../db";
 import { clientsTable } from "../../../db/schema";
 import ApiError from "../../common/utils/api-error";
-import type { ClientPayload } from "../../common/utils/interfaces";
 import { randomBytes, createHmac } from "node:crypto";
+import type { ClientRegisterPayload } from "./admin.models";
 
-export const registerClient = async (payload: ClientPayload) => {
+export const registerClient = async (payload: ClientRegisterPayload) => {
   const { name, applicationUrl, redirectUri } = payload;
 
   if (!name || !applicationUrl || !redirectUri)
