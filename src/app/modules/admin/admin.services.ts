@@ -2,7 +2,7 @@ import { eq } from "drizzle-orm";
 import { db } from "../../../db";
 import { clientsTable } from "../../../db/schema";
 import ApiError from "../../common/utils/api-error";
-import { randomBytes, createHmac } from "node:crypto";
+import { randomBytes, createHash } from "node:crypto";
 import type { ClientRegisterPayload } from "./admin.models";
 
 export const registerClient = async (payload: ClientRegisterPayload) => {
@@ -21,11 +21,8 @@ export const registerClient = async (payload: ClientRegisterPayload) => {
 
   const clientId = randomBytes(32).toString("hex");
   const clientSecret = randomBytes(32).toString("hex");
-  const salt = randomBytes(16).toString("hex");
 
-  const hashedSecret = createHmac("sha256", salt)
-    .update(clientSecret)
-    .digest("hex");
+  const hashedSecret = createHash("sha256").update(clientSecret).digest("hex");
 
   const [result] = await db
     .insert(clientsTable)
@@ -34,7 +31,6 @@ export const registerClient = async (payload: ClientRegisterPayload) => {
       applicationUrl,
       clientId,
       clientSecret: hashedSecret,
-      salt: salt,
       redirectUri,
     })
     .returning({ clientId: clientsTable.clientId });
