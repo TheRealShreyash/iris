@@ -16,6 +16,19 @@ export const clientsTable = pgTable("clients", {
   redirectUri: text("redirect_uri").notNull(),
 });
 
+export const authCodesTable = pgTable("auth_codes", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  code: varchar("code", { length: 255 }).notNull().unique(),
+  userId: uuid("user_id")
+    .notNull()
+    .references(() => usersTable.id, { onDelete: "cascade" }),
+  clientId: uuid("client_id")
+    .notNull()
+    .references(() => clientsTable.id, { onDelete: "cascade" }),
+  expiresAt: timestamp("expires_at").notNull(),
+  nonce: text("nonce"),
+});
+
 export const usersTable = pgTable("users", {
   id: uuid("id").primaryKey().defaultRandom(),
   firstName: varchar("first_name", { length: 45 }).notNull(),

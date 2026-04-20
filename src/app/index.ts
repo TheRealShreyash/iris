@@ -1,12 +1,14 @@
 import express from "express";
 import ApiResponse from "./common/utils/api-response";
 import authRouter from "./modules/auth/auth.routes";
+import adminRouter from "./modules/admin/admin.routes";
 
 export function createApplication() {
   const app = express();
 
   app.use(express.json());
   app.use("/auth", authRouter);
+  app.use("/admin", adminRouter);
 
   app.get("/", (_, res) => {
     ApiResponse.ok(res, "Welcome to Iris.");

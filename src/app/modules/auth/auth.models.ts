@@ -12,4 +12,12 @@ export const userTokenPayloadModel = z.object({
   picture: z.string(),
 });
 
+export const userSigninPayloadModel = z.object({
+  email: z.email(),
+  password: z.string(),
+  clientId: z.string(),
+  nonce: z.string().optional(),
+});
+
 export type UserTokenPayload = z.infer<typeof userTokenPayloadModel>;
+export type UserSigninPayload = z.infer<typeof userSigninPayloadModel>;
