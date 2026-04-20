@@ -20,6 +20,9 @@ export function createApplication() {
       authorization_endpoint:
         `${process.env.ISSUER}/auth/authenticate` ||
         "http://localhost:8080/auth/authenticate",
+      token_endpoint:
+        `${process.env.ISSUER}/auth/token` ||
+        "http://localhost:8080/auth/token",
       userinfo_endpoint:
         `${process.env.ISSUER}/auth/userinfo` ||
         "http://localhost:8080/auth/userinfo",

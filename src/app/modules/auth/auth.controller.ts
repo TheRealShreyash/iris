@@ -1,6 +1,6 @@
 import type { Request, Response } from "express";
 import ApiResponse from "../../common/utils/api-response";
-import { clientExists, getJwks, signin } from "./auth.services";
+import { clientExists, getAccessToken, getJwks, signin } from "./auth.services";
 import { join } from "node:path";
 
 class AuthController {
@@ -37,6 +37,16 @@ class AuthController {
       }
 
       res.redirect(url.toString());
+    } catch (error) {
+      ApiResponse.error(res, error);
+    }
+  }
+
+  static async handleToken(req: Request, res: Response) {
+    try {
+      const { accessToken } = await getAccessToken(req.body);
+
+      ApiResponse.ok(res, "Acess Token generated", { accessToken });
     } catch (error) {
       ApiResponse.error(res, error);
     }
