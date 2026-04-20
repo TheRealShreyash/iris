@@ -20,9 +20,11 @@ export const registerClient = async (payload: ClientRegisterPayload) => {
     throw ApiError.conflict("Client with that application url exists.");
 
   const clientId = randomBytes(32).toString("hex");
+  const clientSecret = randomBytes(32).toString("hex");
+  const salt = randomBytes(16).toString("hex");
 
-  const clientSecret = createHmac("sha256", randomBytes(16).toString("hex"))
-    .update(clientId)
+  const hashedSecret = createHmac("sha256", salt)
+    .update(clientSecret)
     .digest("hex");
 
   const [result] = await db
@@ -31,10 +33,11 @@ export const registerClient = async (payload: ClientRegisterPayload) => {
       name,
       applicationUrl,
       clientId,
-      clientSecret,
+      clientSecret: hashedSecret,
+      salt: salt,
       redirectUri,
     })
-    .returning({ id: clientsTable.id });
+    .returning({ clientId: clientsTable.clientId });
 
-  return result;
+  return { ...result, clientSecret: clientSecret };
 };
