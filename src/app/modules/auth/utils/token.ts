@@ -1,20 +1,23 @@
 import JWT from "jsonwebtoken";
-import { readFileSync } from "node:fs";
 import { createHash } from "node:crypto";
 import type { UserTokenPayload } from "../auth.models";
-
-const privateKey = readFileSync(process.env.PRIVATE_KEY_PATH!, "utf-8");
-const publicKey = readFileSync(process.env.PUBLIC_KEY_PATH!, "utf-8");
+import { PRIVATE_KEY, PUBLIC_KEY } from "../../../../certs/keys";
 
 export function createAccessToken(payload: UserTokenPayload) {
   const kid = createHash("sha256")
-    .update(publicKey)
+    .update(PUBLIC_KEY)
     .digest("hex")
     .substring(0, 16);
-  return JWT.sign(payload, privateKey, {
+  return JWT.sign(payload, PRIVATE_KEY, {
     algorithm: "RS256",
     expiresIn: "15m",
     issuer: "iris-auth",
     keyid: kid,
   });
+}
+
+export function verifyAccessToken(token: string) {
+  return JWT.verify(token, PUBLIC_KEY, {
+    algorithms: ["RS256"],
+  }) as UserTokenPayload;
 }

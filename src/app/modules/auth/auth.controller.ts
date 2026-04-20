@@ -2,6 +2,7 @@ import type { Request, Response } from "express";
 import ApiResponse from "../../common/utils/api-response";
 import { clientExists, getAccessToken, getJwks, signin } from "./auth.services";
 import { join } from "node:path";
+import type { AuthenticatedRequest } from "../../common/utils/interfaces";
 
 class AuthController {
   private static PUBLIC_DIR = join(process.cwd(), "public");
@@ -47,6 +48,14 @@ class AuthController {
       const { accessToken } = await getAccessToken(req.body);
 
       ApiResponse.ok(res, "Acess Token generated", { accessToken });
+    } catch (error) {
+      ApiResponse.error(res, error);
+    }
+  }
+
+  static async handleUserinfo(req: AuthenticatedRequest, res: Response) {
+    try {
+      ApiResponse.ok(res, "User fetched successfully", req.user);
     } catch (error) {
       ApiResponse.error(res, error);
     }

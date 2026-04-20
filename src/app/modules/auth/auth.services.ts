@@ -6,15 +6,14 @@ import { authCodesTable, clientsTable, usersTable } from "../../../db/schema";
 import { eq } from "drizzle-orm";
 import ApiError from "../../common/utils/api-error";
 import type { TokenRequestPayload, UserSigninPayload } from "./auth.models";
-import { createAccessToken } from "./utils/token";
+import { createAccessToken, verifyAccessToken } from "./utils/token";
+import { PUBLIC_KEY } from "../../../certs/keys";
 
 export const getJwks = async () => {
-  const publicKey = readFileSync(process.env.PUBLIC_KEY_PATH!, "utf-8");
-
-  const ecPublicKey = await importSPKI(publicKey, "RS256");
+  const ecPublicKey = await importSPKI(PUBLIC_KEY, "RS256");
   const jwk = await exportJWK(ecPublicKey);
   const kid = createHash("sha256")
-    .update(publicKey)
+    .update(PUBLIC_KEY)
     .digest("hex")
     .substring(0, 16);
   const jwks = [
@@ -106,7 +105,7 @@ export const getAccessToken = async (payload: TokenRequestPayload) => {
 
   if (!codeSelect) throw ApiError.badRequest("Incorrect code");
 
-  if (codeSelect.clientId !== clientId)
+  if (codeSelect.clientId !== client.id)
     throw ApiError.unauthorized("Code was not issued for this client");
 
   if (codeSelect.expiresAt < new Date())
