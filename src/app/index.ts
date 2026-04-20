@@ -27,7 +27,17 @@ export function createApplication() {
         `${process.env.ISSUER}/auth/userinfo` ||
         "http://localhost:8080/auth/userinfo",
       jwks_uri:
-        `${process.env.ISSUER}/certs` || "http://localhost:8080/auth/certs",
+        `${process.env.ISSUER}/auth/certs` ||
+        "http://localhost:8080/auth/certs",
+    });
+  });
+
+  // temporary code
+  // callback url for testing
+  app.get("/callback", (req, res) => {
+    res.json({
+      code: req.query.code,
+      state: req.query.state,
     });
   });
 

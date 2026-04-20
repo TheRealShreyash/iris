@@ -5,7 +5,6 @@ export const userTokenPayloadModel = z.object({
   sub: z.string(),
   email: z.string(),
   emailVerified: z.boolean(),
-  exp: z.number(),
   family_name: z.string(),
   given_name: z.string(),
   name: z.string(),

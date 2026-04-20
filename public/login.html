@@ -467,6 +467,22 @@
           padding: 3rem 2rem;
         }
       }
+
+      .error-banner {
+        display: none;
+        background: rgba(255, 80, 80, 0.08);
+        border: 1px solid rgba(255, 80, 80, 0.25);
+        border-radius: 2px;
+        padding: 0.7rem 0.9rem;
+        margin-bottom: 1.2rem;
+        font-size: 0.78rem;
+        color: rgba(255, 120, 120, 0.9);
+        letter-spacing: 0.03em;
+        animation: rise 0.25s cubic-bezier(0.22, 1, 0.36, 1) both;
+      }
+      .error-banner.visible {
+        display: block;
+      }
     </style>
   </head>
   <body>
@@ -520,6 +536,8 @@
 
         <div class="or-divider">or</div> -->
 
+        <div class="error-banner" id="errorBanner"></div>
+
         <form onsubmit="handleLogin(event)">
           <div class="field">
             <div class="field-top">
@@ -571,11 +589,31 @@
           </div>
         </div>
 
-        <div class="foot">No account? <a href="signup.html">Create one</a></div>
+        <div class="foot">No account? <a href="/signup">Create one</a></div>
       </div>
     </div>
 
     <script>
+      const params = new URLSearchParams(window.location.search);
+      const clientId = params.get("clientId");
+      const state = params.get("state");
+      const nonce = params.get("nonce");
+
+      document.querySelector(".app-banner-info strong").textContent =
+        clientId ?? "Unknown App";
+
+      function showError(msg) {
+        const banner = document.getElementById("errorBanner");
+        banner.textContent = msg;
+        banner.classList.add("visible");
+      }
+
+      function clearError() {
+        const banner = document.getElementById("errorBanner");
+        banner.textContent = "";
+        banner.classList.remove("visible");
+      }
+
       function togglePwd() {
         const inp = document.getElementById("pw");
         const btn = inp.parentElement.querySelector(".pw-toggle");
@@ -589,17 +627,39 @@
         chk.classList.toggle("checked", checked);
         chk.textContent = checked ? "✓" : "";
       }
-      function handleLogin(e) {
+      async function handleLogin(e) {
         e.preventDefault();
+        clearError();
         const btn = document.getElementById("loginBtn");
         btn.textContent = "Signing in...";
         btn.style.opacity = "0.55";
         btn.disabled = true;
-        setTimeout(() => {
+        try {
+          const res = await fetch("/auth/authenticate/sign-in", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              email: document.getElementById("email").value,
+              password: document.getElementById("pw").value,
+              clientId,
+              ...(state && { state }),
+              ...(nonce && { nonce }),
+            }),
+          });
+
+          if (!res.ok) {
+            const err = await res.json();
+            throw new Error(err.message || "Sign in failed");
+          }
+
           btn.textContent = "Redirecting...";
-          btn.style.opacity = "1";
           btn.style.background = "#d8d8d8";
-        }, 1300);
+        } catch (error) {
+          btn.textContent = "Sign In";
+          btn.style.opacity = "1";
+          btn.disabled = false;
+          showError(error.message);
+        }
       }
     </script>
   </body>

@@ -128,7 +128,6 @@ export const getAccessToken = async (payload: TokenRequestPayload) => {
     sub: user.id,
     email: user.email,
     emailVerified: user.emailVerified,
-    exp: Math.floor(Date.now() / 1000) + 15 * 60,
     family_name: user.lastName ?? "",
     given_name: user.firstName,
     name: `${user.firstName} ${user.lastName ?? ""}`.trim(),

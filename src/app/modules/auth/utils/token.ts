@@ -11,7 +11,6 @@ export function createAccessToken(payload: UserTokenPayload) {
   return JWT.sign(payload, PRIVATE_KEY, {
     algorithm: "RS256",
     expiresIn: "15m",
-    issuer: "iris-auth",
     keyid: kid,
   });
 }

@@ -8,6 +8,13 @@
       "when": 1776623965322,
       "tag": "0000_rich_magdalene",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1776676573767,
+      "tag": "0001_large_manta",
+      "breakpoints": true
     }
   ]
 }
