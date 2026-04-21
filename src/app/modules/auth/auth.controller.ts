@@ -1,6 +1,12 @@
 import type { Request, Response } from "express";
 import ApiResponse from "../../common/utils/api-response";
-import { clientExists, getAccessToken, getJwks, signin } from "./auth.services";
+import {
+  clientExists,
+  getAccessToken,
+  getJwks,
+  signin,
+  signup,
+} from "./auth.services";
 import { join } from "node:path";
 import type { AuthenticatedRequest } from "../../common/utils/interfaces";
 
@@ -26,6 +32,17 @@ class AuthController {
     }
   }
 
+  static async handleAuthenticateSignup(req: Request, res: Response) {
+    try {
+      const result = await clientExists(req.query.clientId as string);
+      if (result) {
+        res.sendFile(join(AuthController.PUBLIC_DIR, "signup.html"));
+      }
+    } catch (error) {
+      res.sendFile(join(AuthController.PUBLIC_DIR, "error.html"));
+    }
+  }
+
   static async handleSignin(req: Request, res: Response) {
     try {
       const { code, redirectUri } = await signin(req.body);
@@ -38,6 +55,18 @@ class AuthController {
       }
 
       res.redirect(url.toString());
+    } catch (error) {
+      ApiResponse.error(res, error);
+    }
+  }
+
+  static async handleSignup(req: Request, res: Response) {
+    try {
+      const result = await signup(req.body);
+
+      ApiResponse.created(res, "User was created successfully", {
+        id: result?.id,
+      });
     } catch (error) {
       ApiResponse.error(res, error);
     }

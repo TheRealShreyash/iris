@@ -18,6 +18,13 @@ export const userSigninPayloadModel = z.object({
   nonce: z.string().optional(),
 });
 
+export const userSignupPayloadModel = z.object({
+  firstName: z.string(),
+  lastName: z.string().optional(),
+  email: z.string(),
+  password: z.string(),
+});
+
 export const tokenRequestModel = z.object({
   clientId: z.string(),
   clientSecret: z.string(),
@@ -27,3 +34,4 @@ export const tokenRequestModel = z.object({
 export type UserTokenPayload = z.infer<typeof userTokenPayloadModel>;
 export type UserSigninPayload = z.infer<typeof userSigninPayloadModel>;
 export type TokenRequestPayload = z.infer<typeof tokenRequestModel>;
+export type UserSignupPayload = z.infer<typeof userSignupPayloadModel>;
