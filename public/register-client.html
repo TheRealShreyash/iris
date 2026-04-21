@@ -338,6 +338,107 @@
       .foot a:hover {
         color: rgba(255, 255, 255, 0.7);
       }
+
+      .error-banner {
+        display: none;
+        background: rgba(255, 80, 80, 0.08);
+        border: 1px solid rgba(255, 80, 80, 0.25);
+        border-radius: 2px;
+        padding: 0.7rem 0.9rem;
+        margin-bottom: 1.2rem;
+        font-size: 0.78rem;
+        color: rgba(255, 120, 120, 0.9);
+        letter-spacing: 0.03em;
+        animation: rise 0.25s cubic-bezier(0.22, 1, 0.36, 1) both;
+      }
+      .error-banner.visible {
+        display: block;
+      }
+
+      /* success modal */
+      .modal-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.75);
+        z-index: 100;
+        align-items: center;
+        justify-content: center;
+        padding: 1.5rem;
+      }
+      .modal-overlay.visible {
+        display: flex;
+      }
+      .modal {
+        background: #111;
+        border: 1px solid var(--border);
+        border-radius: 2px;
+        padding: 2rem;
+        width: 100%;
+        max-width: 460px;
+        box-shadow: 0 48px 96px rgba(0, 0, 0, 0.8);
+        animation: rise 0.3s cubic-bezier(0.22, 1, 0.36, 1) both;
+      }
+      .modal-eyebrow {
+        font-size: 0.63rem;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: rgba(100, 200, 120, 0.7);
+        margin-bottom: 0.5rem;
+        font-weight: 500;
+      }
+      .modal h3 {
+        font-family: "Cormorant Garamond", serif;
+        font-weight: 400;
+        font-size: 1.5rem;
+        color: #fff;
+        margin-bottom: 0.4rem;
+      }
+      .modal-warn {
+        font-size: 0.75rem;
+        color: rgba(255, 180, 80, 0.8);
+        margin-bottom: 1.4rem;
+        line-height: 1.55;
+        border: 1px solid rgba(255, 180, 80, 0.2);
+        border-radius: 2px;
+        padding: 0.55rem 0.75rem;
+        background: rgba(255, 180, 80, 0.05);
+      }
+      .cred-field {
+        margin-bottom: 1rem;
+      }
+      .cred-label {
+        font-size: 0.63rem;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: var(--muted);
+        margin-bottom: 0.35rem;
+      }
+      .cred-value {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: var(--input-bg);
+        border: 1px solid var(--border);
+        border-radius: 2px;
+        padding: 0.65rem 0.85rem;
+        font-size: 0.78rem;
+        color: var(--text);
+        font-family: monospace;
+        word-break: break-all;
+        cursor: pointer;
+        transition: border-color 0.15s;
+      }
+      .cred-value:hover {
+        border-color: var(--borderhi);
+      }
+      .copy-hint {
+        font-size: 0.65rem;
+        color: var(--muted);
+        margin-left: auto;
+        flex-shrink: 0;
+        font-family: "Instrument Sans", sans-serif;
+      }
     </style>
   </head>
   <body>
@@ -355,6 +456,7 @@
             issued upon registration.
           </p>
         </div>
+        <div class="error-banner" id="errorBanner"></div>
         <form onsubmit="handleSubmit(event)">
           <div class="field">
             <div class="field-top">
@@ -459,24 +561,100 @@
         </div>
       </div>
     </div>
+
+    <div class="modal-overlay" id="modalOverlay">
+      <div class="modal">
+        <div class="modal-eyebrow">Registration Successful</div>
+        <h3>Save your credentials</h3>
+        <div class="modal-warn">
+          ⚠ Your client secret is shown only once and cannot be recovered. Copy
+          it now.
+        </div>
+        <div class="cred-field">
+          <div class="cred-label">Client ID</div>
+          <div class="cred-value" onclick="copyText(this)" id="outClientId">
+            <span></span><span class="copy-hint">click to copy</span>
+          </div>
+        </div>
+        <div class="cred-field">
+          <div class="cred-label">Client Secret</div>
+          <div class="cred-value" onclick="copyText(this)" id="outClientSecret">
+            <span></span><span class="copy-hint">click to copy</span>
+          </div>
+        </div>
+        <button
+          class="btn"
+          onclick="
+            document.getElementById('modalOverlay').classList.remove('visible')
+          "
+          style="margin-top: 1rem"
+        >
+          Done
+        </button>
+      </div>
+    </div>
     <script>
-      function toggleScope(el) {
-        el.classList.toggle("on");
-        el.querySelector(".scope-box").innerHTML = el.classList.contains("on")
-          ? "&#10003;"
-          : "";
+      function showError(msg) {
+        const banner = document.getElementById("errorBanner");
+        banner.textContent = msg;
+        banner.classList.add("visible");
       }
-      function handleSubmit(e) {
+
+      function clearError() {
+        const banner = document.getElementById("errorBanner");
+        banner.textContent = "";
+        banner.classList.remove("visible");
+      }
+
+      function showCredentials(clientId, clientSecret) {
+        document
+          .getElementById("outClientId")
+          .querySelector("span").textContent = clientId;
+        document
+          .getElementById("outClientSecret")
+          .querySelector("span").textContent = clientSecret;
+        document.getElementById("modalOverlay").classList.add("visible");
+      }
+
+      function copyText(el) {
+        const text = el.querySelector("span").textContent;
+        navigator.clipboard.writeText(text);
+        const hint = el.querySelector(".copy-hint");
+        hint.textContent = "copied!";
+        setTimeout(() => (hint.textContent = "click to copy"), 2000);
+      }
+
+      async function handleSubmit(e) {
         e.preventDefault();
+        clearError();
+
         const btn = document.getElementById("submitBtn");
         btn.textContent = "Registering...";
         btn.style.opacity = "0.55";
         btn.disabled = true;
-        setTimeout(() => {
-          btn.textContent = "Application Registered";
+
+        try {
+          const res = await fetch("/admin/register-client", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              name: document.getElementById("appName").value,
+              applicationUrl: document.getElementById("appUrl").value,
+              redirectUri: document.getElementById("redirectUrl").value,
+            }),
+          });
+
+          const body = await res.json(); // ← called as function
+          if (!res.ok) throw new Error(body.error || "Registration failed");
+
+          showCredentials(body.data.clientId, body.data.clientSecret);
+        } catch (error) {
+          showError(error.message);
+        } finally {
+          btn.textContent = "Register Application";
           btn.style.opacity = "1";
-          btn.style.background = "#d8d8d8";
-        }, 1300);
+          btn.disabled = false;
+        }
       }
     </script>
   </body>

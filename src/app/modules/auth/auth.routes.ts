@@ -21,13 +21,13 @@ authRouter.get("/authenticate/signup", AuthController.handleAuthenticateSignup);
 
 authRouter.post(
   "/authenticate/sign-in",
-  validate(userSignupPayloadModel),
+  validate(userSigninPayloadModel),
   AuthController.handleSignin,
 );
 
 authRouter.post(
   "/authenticate/sign-up",
-  validate(userSigninPayloadModel),
+  validate(userSignupPayloadModel),
   AuthController.handleSignup,
 );
 

@@ -589,7 +589,9 @@
           </div>
         </div>
 
-        <div class="foot">No account? <a href="/signup">Create one</a></div>
+        <div class="foot">
+          No account? <a href="#" id="signupLink">Create one</a>
+        </div>
       </div>
     </div>
 
@@ -601,6 +603,14 @@
 
       document.querySelector(".app-banner-info strong").textContent =
         clientId ?? "Unknown App";
+
+      const signupLink = document.getElementById("signupLink");
+
+      if (clientId) {
+        signupLink.href = `/auth/authenticate/signup?clientId=${clientId}`;
+      } else {
+        signupLink.href = "/auth/authenticate/signup";
+      }
 
       function showError(msg) {
         const banner = document.getElementById("errorBanner");

@@ -465,6 +465,21 @@
       .foot a:hover {
         color: rgba(255, 255, 255, 0.65);
       }
+      .error-banner {
+        display: none;
+        background: rgba(255, 80, 80, 0.08);
+        border: 1px solid rgba(255, 80, 80, 0.25);
+        border-radius: 2px;
+        padding: 0.7rem 0.9rem;
+        margin-bottom: 1.2rem;
+        font-size: 0.78rem;
+        color: rgba(255, 120, 120, 0.9);
+        letter-spacing: 0.03em;
+        animation: rise 0.25s cubic-bezier(0.22, 1, 0.36, 1) both;
+      }
+      .error-banner.visible {
+        display: block;
+      }
     </style>
   </head>
   <body>
@@ -505,7 +520,7 @@
           <div class="app-mono">A</div>
           <div>
             <p>Creating account to access</p>
-            <strong>Acme Dashboard</strong>
+            <strong id="appName"></strong>
           </div>
         </div>
 
@@ -517,13 +532,16 @@
 
     <div class="or-divider">or</div> -->
 
+        <div class="error-banner" id="errorBanner"></div>
+
         <form onsubmit="handleSignup(event)">
           <div class="field-row-2">
             <div class="field">
               <div class="field-top"><label>First Name</label></div>
               <input
                 type="text"
-                placeholder="Alex"
+                id="firstName"
+                placeholder="Shreyash"
                 required
                 autocomplete="given-name"
               />
@@ -532,8 +550,8 @@
               <div class="field-top"><label>Last Name</label></div>
               <input
                 type="text"
-                placeholder="Morgan"
-                required
+                id="lastName"
+                placeholder="Koshta"
                 autocomplete="family-name"
               />
             </div>
@@ -552,7 +570,7 @@
             />
           </div>
 
-          <div class="field">
+          <!-- <div class="field">
             <div class="field-top"><label for="username">Username</label></div>
             <input
               type="text"
@@ -561,7 +579,7 @@
               required
               autocomplete="username"
             />
-          </div>
+          </div> -->
 
           <div class="field">
             <div class="field-top"><label for="pw1">Password</label></div>
@@ -610,14 +628,14 @@
             </div>
           </div>
 
-          <label class="terms-row" onclick="toggleTerms(this)">
+          <!-- <label class="terms-row" onclick="toggleTerms(this)">
             <input type="checkbox" id="termsChk" required />
             <span class="chk" id="termsBox"></span>
             <span class="terms-text"
               >I agree to Iris's <a href="#">Terms of Service</a> and
               <a href="#">Privacy Policy</a>.</span
             >
-          </label>
+          </label> -->
 
           <button type="submit" class="btn" id="signupBtn">
             Create Account
@@ -631,11 +649,39 @@
     </div>
 
     <script>
+      const params = new URLSearchParams(window.location.search);
+      const clientId = params.get("clientId");
+      const state = params.get("state");
+      const nonce = params.get("nonce");
+
+      // show clientId in banner
+      document.getElementById("appName").textContent =
+        clientId ?? "Unknown App";
+
+      // carry clientId to sign in link
+      const signinLink = document.querySelector(".foot a");
+      signinLink.href = clientId
+        ? `/auth/authenticate?clientId=${clientId}`
+        : "/auth/authenticate";
+
+      function showError(msg) {
+        const banner = document.getElementById("errorBanner");
+        banner.textContent = msg;
+        banner.classList.add("visible");
+      }
+
+      function clearError() {
+        const banner = document.getElementById("errorBanner");
+        banner.textContent = "";
+        banner.classList.remove("visible");
+      }
+
       function togglePwd(id, btn) {
         const inp = document.getElementById(id);
         inp.type = inp.type === "password" ? "text" : "password";
         btn.textContent = inp.type === "password" ? "Show" : "Hide";
       }
+
       function checkStrength(input) {
         const v = input.value;
         let s = 0;
@@ -660,32 +706,62 @@
         fill.style.opacity = opacities[Math.min(s, 5)];
         hint.textContent = labels[Math.min(s, 5)];
       }
-      function toggleTerms(el) {
-        const cb = el.querySelector("input");
-        const box = document.getElementById("termsBox");
-        const nowChecked = !cb.checked;
-        box.classList.toggle("checked", nowChecked);
-        box.textContent = nowChecked ? "✓" : "";
-      }
-      function handleSignup(e) {
+
+      // function toggleTerms(el) {
+      //   const cb = el.querySelector("input");
+      //   const box = document.getElementById("termsBox");
+      //   const nowChecked = !cb.checked;
+      //   box.classList.toggle("checked", nowChecked);
+      //   box.textContent = nowChecked ? "✓" : "";
+      // }
+
+      async function handleSignup(e) {
         e.preventDefault();
+        clearError();
+
         const p1 = document.getElementById("pw1").value;
         const p2 = document.getElementById("pw2").value;
-        const pw2el = document.getElementById("pw2");
+
         if (p1 !== p2) {
-          pw2el.style.borderColor = "rgba(255,255,255,0.4)";
-          pw2el.placeholder = "Passwords do not match";
+          showError("Passwords do not match");
           return;
         }
+
         const btn = document.getElementById("signupBtn");
         btn.textContent = "Creating account...";
         btn.style.opacity = "0.55";
         btn.disabled = true;
-        setTimeout(() => {
-          btn.textContent = "Account created — check your email";
-          btn.style.opacity = "1";
+
+        try {
+          const res = await fetch("/auth/authenticate/sign-up", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              firstName: document.getElementById("firstName").value,
+              lastName: document.getElementById("lastName").value || undefined,
+              email: document.getElementById("email").value,
+              password: p1,
+            }),
+          });
+
+          const body = await res.json();
+          if (!res.ok) throw new Error(body.error || "Signup failed");
+
+          // account created — redirect to login with clientId
+          btn.textContent = "Account created — signing you in...";
           btn.style.background = "#d8d8d8";
-        }, 1300);
+
+          setTimeout(() => {
+            window.location.href = clientId
+              ? `/auth/authenticate?clientId=${clientId}`
+              : "/auth/authenticate";
+          }, 1000);
+        } catch (error) {
+          btn.textContent = "Create Account";
+          btn.style.opacity = "1";
+          btn.disabled = false;
+          showError(error.message);
+        }
       }
     </script>
   </body>
