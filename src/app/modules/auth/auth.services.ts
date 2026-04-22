@@ -167,10 +167,13 @@ export const getTokens = async (payload: TokenRequestPayload) => {
   });
 
   const refreshToken = createRefreshToken({ id: user.id });
+  const hashedRefreshToken = createHash("sha256")
+    .update(refreshToken)
+    .digest("hex");
 
   await db
     .update(usersTable)
-    .set({ refreshToken })
+    .set({ refreshToken: hashedRefreshToken })
     .where(eq(usersTable.id, user.id));
 
   return { accessToken: accessToken, refreshToken: refreshToken };
