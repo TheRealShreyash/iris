@@ -78,7 +78,7 @@ class AuthController {
     try {
       const { accessToken, refreshToken } = await getTokens(req.body);
 
-      ApiResponse.ok(res, "Acess Token generated", {
+      ApiResponse.ok(res, "Tokens generated", {
         accessToken,
         refreshToken,
       });
