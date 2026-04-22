@@ -1,6 +1,5 @@
 import { exportJWK, importSPKI } from "jose";
 import { createHash, createHmac, randomBytes } from "node:crypto";
-import { readFileSync } from "node:fs";
 import { db } from "../../../db";
 import { authCodesTable, clientsTable, usersTable } from "../../../db/schema";
 import { eq } from "drizzle-orm";
@@ -10,7 +9,7 @@ import type {
   UserSigninPayload,
   UserSignupPayload,
 } from "./auth.models";
-import { createAccessToken, verifyAccessToken } from "./utils/token";
+import { createAccessToken, createRefreshToken } from "./utils/token";
 import { PUBLIC_KEY } from "../../../certs/keys";
 
 export const getJwks = async () => {
@@ -114,7 +113,7 @@ export const signup = async (payload: UserSignupPayload) => {
   return result;
 };
 
-export const getAccessToken = async (payload: TokenRequestPayload) => {
+export const getTokens = async (payload: TokenRequestPayload) => {
   const { clientId, clientSecret, code } = payload;
 
   const [client] = await db
@@ -167,5 +166,52 @@ export const getAccessToken = async (payload: TokenRequestPayload) => {
     picture: undefined, //hardcode for now
   });
 
-  return { accessToken: accessToken };
+  const refreshToken = createRefreshToken({ id: user.id });
+
+  await db
+    .update(usersTable)
+    .set({ refreshToken })
+    .where(eq(usersTable.id, user.id));
+
+  return { accessToken: accessToken, refreshToken: refreshToken };
+};
+
+export const refreshTokens = async (refreshToken: string) => {
+  if (!refreshToken) throw ApiError.badRequest("No refresh token was sent");
+
+  const hash = createHash("sha256")
+    .update(refreshToken as any)
+    .digest("hex");
+
+  const [user] = await db
+    .select()
+    .from(usersTable)
+    .where(eq(usersTable.refreshToken, hash))
+    .limit(1);
+
+  if (!user) throw ApiError.unauthorized("Invalid refresh token");
+
+  const newRefreshToken = createRefreshToken({ id: user.id });
+  const ISSUER = process.env.ISSUER || "http://localhost:8080";
+  const accessToken = createAccessToken({
+    iss: ISSUER,
+    sub: user.id,
+    email: user.email,
+    emailVerified: user.emailVerified,
+    family_name: user.lastName ?? "",
+    given_name: user.firstName,
+    name: `${user.firstName} ${user.lastName ?? ""}`.trim(),
+    picture: undefined, //hardcode for now
+  });
+
+  const newHash = createHash("sha256")
+    .update(refreshToken as any)
+    .digest("hex");
+
+  await db
+    .update(usersTable)
+    .set({ refreshToken: newHash })
+    .where(eq(usersTable.id, user.id));
+
+  return { accessToken, refreshToken: newRefreshToken };
 };

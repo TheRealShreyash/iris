@@ -15,8 +15,26 @@ export function createAccessToken(payload: UserTokenPayload) {
   });
 }
 
+export function createRefreshToken(payload: { id: string }) {
+  const kid = createHash("sha256")
+    .update(PUBLIC_KEY)
+    .digest("hex")
+    .substring(0, 16);
+  return JWT.sign(payload, PRIVATE_KEY, {
+    algorithm: "RS256",
+    expiresIn: "24h",
+    keyid: kid,
+  });
+}
+
 export function verifyAccessToken(token: string) {
   return JWT.verify(token, PUBLIC_KEY, {
     algorithms: ["RS256"],
   }) as UserTokenPayload;
+}
+
+export function verifyRefreshToken(token: string) {
+  return JWT.verify(token, PUBLIC_KEY, {
+    algorithms: ["RS256"],
+  }) as { id: string };
 }

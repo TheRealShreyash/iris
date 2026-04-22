@@ -2,13 +2,15 @@ import type { Request, Response } from "express";
 import ApiResponse from "../../common/utils/api-response";
 import {
   clientExists,
-  getAccessToken,
   getJwks,
+  getTokens,
+  refreshTokens,
   signin,
   signup,
 } from "./auth.services";
 import { join } from "node:path";
 import type { AuthenticatedRequest } from "../../common/utils/interfaces";
+import type { RefreshTokenPayload } from "./auth.models";
 
 class AuthController {
   private static PUBLIC_DIR = join(process.cwd(), "public");
@@ -74,9 +76,27 @@ class AuthController {
 
   static async handleToken(req: Request, res: Response) {
     try {
-      const { accessToken } = await getAccessToken(req.body);
+      const { accessToken, refreshToken } = await getTokens(req.body);
 
-      ApiResponse.ok(res, "Acess Token generated", { accessToken });
+      ApiResponse.ok(res, "Acess Token generated", {
+        accessToken,
+        refreshToken,
+      });
+    } catch (error) {
+      ApiResponse.error(res, error);
+    }
+  }
+
+  static async handleRefreshToken(req: Request, res: Response) {
+    try {
+      const { refreshToken } = req.body as RefreshTokenPayload;
+
+      const tokens = await refreshTokens(refreshToken);
+
+      ApiResponse.ok(res, "Tokens refreshed successfully", {
+        accessToken: tokens.accessToken,
+        refreshToken: tokens.refreshToken,
+      });
     } catch (error) {
       ApiResponse.error(res, error);
     }

@@ -31,7 +31,12 @@ export const tokenRequestModel = z.object({
   code: z.string(),
 });
 
+export const refreshTokenModel = z.object({
+  refreshToken: z.string(),
+});
+
 export type UserTokenPayload = z.infer<typeof userTokenPayloadModel>;
 export type UserSigninPayload = z.infer<typeof userSigninPayloadModel>;
 export type TokenRequestPayload = z.infer<typeof tokenRequestModel>;
 export type UserSignupPayload = z.infer<typeof userSignupPayloadModel>;
+export type RefreshTokenPayload = z.infer<typeof refreshTokenModel>;

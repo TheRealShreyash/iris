@@ -1,8 +1,8 @@
 import { Router } from "express";
-import type { Request, Response } from "express";
 import AuthController from "./auth.controller";
 import validate from "../../common/middlewares/validate.middlware";
 import {
+  refreshTokenModel,
   tokenRequestModel,
   userSigninPayloadModel,
   userSignupPayloadModel,
@@ -35,6 +35,12 @@ authRouter.post(
   "/token",
   validate(tokenRequestModel),
   AuthController.handleToken,
+);
+
+authRouter.post(
+  "/refresh-token",
+  validate(refreshTokenModel),
+  AuthController.handleRefreshToken,
 );
 
 authRouter.get(
