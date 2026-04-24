@@ -32,7 +32,7 @@ authRouter.post(
 );
 
 authRouter.post(
-  "/authenticate/logout",
+  "/logout",
   authenticate(),
   restrictToAuthenticatedUser(),
   AuthController.handleLogout,
