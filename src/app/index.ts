@@ -29,6 +29,20 @@ export function createApplication() {
       jwks_uri:
         `${process.env.ISSUER}/auth/certs` ||
         "http://localhost:8080/auth/certs",
+      response_types_supported: ["code"],
+      subject_types_supported: ["public"],
+      id_token_signing_alg_values_supported: ["RS256"],
+      scopes_supported: ["openid", "profile", "email"],
+      claims_supported: [
+        "iss",
+        "sub",
+        "email",
+        "emailVerified",
+        "family_name",
+        "given_name",
+        "name",
+        "picture",
+      ],
     });
   });
 
