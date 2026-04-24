@@ -4,6 +4,7 @@ import {
   clientExists,
   getJwks,
   getTokens,
+  logout,
   refreshTokens,
   signin,
   signup,
@@ -11,6 +12,7 @@ import {
 import { join } from "node:path";
 import type { AuthenticatedRequest } from "../../common/utils/interfaces";
 import type { RefreshTokenPayload } from "./auth.models";
+import ApiError from "../../common/utils/api-error";
 
 class AuthController {
   private static PUBLIC_DIR = join(process.cwd(), "public");
@@ -105,6 +107,16 @@ class AuthController {
   static async handleUserinfo(req: AuthenticatedRequest, res: Response) {
     try {
       ApiResponse.ok(res, "User fetched successfully", req.user);
+    } catch (error) {
+      ApiResponse.error(res, error);
+    }
+  }
+
+  static async handleLogout(req: AuthenticatedRequest, res: Response) {
+    try {
+      await logout(req.user.sub);
+
+      ApiResponse.ok(res, "Logged out successfully");
     } catch (error) {
       ApiResponse.error(res, error);
     }

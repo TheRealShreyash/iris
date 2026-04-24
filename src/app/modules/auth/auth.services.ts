@@ -218,3 +218,10 @@ export const refreshTokens = async (refreshToken: string) => {
 
   return { accessToken, refreshToken: newRefreshToken };
 };
+
+export const logout = async (userId: string) => {
+  await db
+    .update(usersTable)
+    .set({ refreshToken: null })
+    .where(eq(usersTable.id, userId));
+};

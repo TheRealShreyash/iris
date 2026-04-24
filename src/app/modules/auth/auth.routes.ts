@@ -32,6 +32,13 @@ authRouter.post(
 );
 
 authRouter.post(
+  "/authenticate/logout",
+  authenticate(),
+  restrictToAuthenticatedUser(),
+  AuthController.handleLogout,
+);
+
+authRouter.post(
   "/token",
   validate(tokenRequestModel),
   AuthController.handleToken,
