@@ -225,3 +225,15 @@ export const logout = async (userId: string) => {
     .set({ refreshToken: null })
     .where(eq(usersTable.id, userId));
 };
+
+export const getClientMetadata = async (clientId: string) => {
+  if (!clientId) throw ApiError.badRequest("No client id provided");
+
+  const [client] = await db
+    .select()
+    .from(clientsTable)
+    .where(eq(clientsTable.clientId, clientId))
+    .limit(1);
+
+  return { name: client?.name, applicationUrl: client?.applicationUrl };
+};

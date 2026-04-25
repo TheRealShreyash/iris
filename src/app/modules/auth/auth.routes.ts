@@ -31,6 +31,8 @@ authRouter.post(
   AuthController.handleSignup,
 );
 
+authRouter.get("/client-metadata", AuthController.handleGetClientMetadata);
+
 authRouter.post(
   "/logout",
   authenticate(),

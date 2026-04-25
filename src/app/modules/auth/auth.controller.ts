@@ -2,6 +2,7 @@ import type { Request, Response } from "express";
 import ApiResponse from "../../common/utils/api-response";
 import {
   clientExists,
+  getClientMetadata,
   getJwks,
   getTokens,
   logout,
@@ -117,6 +118,21 @@ class AuthController {
       await logout(req.user.sub);
 
       ApiResponse.ok(res, "Logged out successfully");
+    } catch (error) {
+      ApiResponse.error(res, error);
+    }
+  }
+
+  static async handleGetClientMetadata(req: Request, res: Response) {
+    try {
+      const { name, applicationUrl } = await getClientMetadata(
+        req.query.clientId as any,
+      );
+
+      ApiResponse.ok(res, "Client data fetched successfully", {
+        name,
+        applicationUrl,
+      });
     } catch (error) {
       ApiResponse.error(res, error);
     }
