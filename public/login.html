@@ -601,8 +601,33 @@
       const state = params.get("state");
       const nonce = params.get("nonce");
 
-      document.querySelector(".app-banner-info strong").textContent =
-        clientId ?? "Unknown App";
+      async function loadClientData() {
+        if (!clientId) {
+          document.querySelector(".app-banner-info strong").textContent =
+            "Unknown App";
+        }
+
+        try {
+          const res = await fetch(`/auth/client-metadata?clientId=${clientId}`);
+
+          const result = await res.json();
+
+          if (result.success && result.data) {
+            const appName = result.data.name;
+            document.querySelector(".app-banner-info strong").textContent =
+              appName;
+            document.querySelector(".app-mono").textContent = appName
+              .charAt(0)
+              .toUpperCase();
+          }
+        } catch (error) {
+          console.log(error.message);
+          document.querySelector(".app-banner-info strong").textContent =
+            clientId;
+        }
+      }
+
+      loadClientData();
 
       const signupLink = document.getElementById("signupLink");
 

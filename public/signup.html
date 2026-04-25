@@ -643,7 +643,7 @@
         </form>
 
         <div class="foot">
-          Already have an account? <a href="login.html">Sign in</a>
+          Already have an account? <a href="/auth/authenticate">Sign in</a>
         </div>
       </div>
     </div>
@@ -654,11 +654,31 @@
       const state = params.get("state");
       const nonce = params.get("nonce");
 
-      // show clientId in banner
-      document.getElementById("appName").textContent =
-        clientId ?? "Unknown App";
+      async function loadClientData() {
+        if (!clientId) {
+          document.querySelector("#appName").textContent = "Unknown App";
+        }
 
-      // carry clientId to sign in link
+        try {
+          const res = await fetch(`/auth/client-metadata?clientId=${clientId}`);
+
+          const result = await res.json();
+
+          if (result.success && result.data) {
+            const appName = result.data.name;
+            document.querySelector("#appName").textContent = appName;
+            document.querySelector(".app-mono").textContent = appName
+              .charAt(0)
+              .toUpperCase();
+          }
+        } catch (error) {
+          console.log(error.message);
+          document.querySelector("#appName").textContent = clientId;
+        }
+      }
+
+      loadClientData();
+
       const signinLink = document.querySelector(".foot a");
       signinLink.href = clientId
         ? `/auth/authenticate?clientId=${clientId}`
