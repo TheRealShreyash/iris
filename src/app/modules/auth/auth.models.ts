@@ -3,7 +3,7 @@ import { z } from "zod";
 export const userTokenPayloadModel = z.object({
   iss: z.string(),
   sub: z.string(),
-  email: z.string(),
+  email: z.email(),
   emailVerified: z.boolean(),
   family_name: z.string(),
   given_name: z.string(),
@@ -21,7 +21,7 @@ export const userSigninPayloadModel = z.object({
 export const userSignupPayloadModel = z.object({
   firstName: z.string(),
   lastName: z.string().optional(),
-  email: z.string(),
+  email: z.email(),
   password: z.string(),
 });
 
@@ -33,6 +33,10 @@ export const tokenRequestModel = z.object({
 
 export const refreshTokenModel = z.object({
   refreshToken: z.string(),
+});
+
+export const emailVerificationModel = z.object({
+  email: z.email(),
 });
 
 export type UserTokenPayload = z.infer<typeof userTokenPayloadModel>;
