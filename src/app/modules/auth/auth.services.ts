@@ -9,8 +9,15 @@ import type {
   UserSigninPayload,
   UserSignupPayload,
 } from "./auth.models";
-import { createAccessToken, createRefreshToken } from "./utils/token";
+import {
+  createAccessToken,
+  createEmailVerificationToken,
+  createRefreshToken,
+  verifyEmailVerificationToken,
+} from "./utils/token";
 import { PUBLIC_KEY } from "../../../certs/keys";
+import nodemailer from "nodemailer";
+import { MailtrapTransport } from "mailtrap";
 
 export const getJwks = async () => {
   const ecPublicKey = await importSPKI(PUBLIC_KEY, "RS256");
@@ -109,6 +116,13 @@ export const signup = async (payload: UserSignupPayload) => {
       salt,
     })
     .returning({ id: usersTable.id });
+
+  const verificationToken = createEmailVerificationToken({
+    id: result?.id as string,
+  });
+  const verificationLink = `${process.env.ISSUER}/auth/verify-email?token=${verificationToken}`;
+
+  await sendVerificationEmail(email, verificationLink);
 
   return result;
 };
@@ -236,4 +250,72 @@ export const getClientMetadata = async (clientId: string) => {
     .limit(1);
 
   return { name: client?.name, applicationUrl: client?.applicationUrl };
+};
+
+export const resendVerificationEmail = async (email: string) => {
+  const [user] = await db
+    .select()
+    .from(usersTable)
+    .where(eq(usersTable.email, email))
+    .limit(1);
+
+  if (user?.emailVerified)
+    throw ApiError.badRequest("Email is already verified");
+
+  const verificationToken = createEmailVerificationToken({
+    id: user?.id as string,
+  });
+  const verificationLink = `${process.env.ISSUER}/auth/verify-email?token=${verificationToken}`;
+
+  await sendVerificationEmail(email, verificationLink);
+  return;
+};
+
+export const verifyEmail = async (token: string) => {
+  const payload = verifyEmailVerificationToken(token);
+
+  if (!payload) throw ApiError.badRequest("Invalid or expired link");
+
+  const [user] = await db
+    .select()
+    .from(usersTable)
+    .where(eq(usersTable.id, payload.id));
+
+  if (!user) throw ApiError.notFound("User with that email doesn't exist");
+
+  if (user.emailVerified)
+    throw ApiError.badRequest("Email is already verified");
+
+  await db
+    .update(usersTable)
+    .set({ emailVerified: true })
+    .where(eq(usersTable.id, user.id));
+
+  return;
+};
+
+export const sendVerificationEmail = async (email: string, link: string) => {
+  if (!email) throw ApiError.badRequest("No email provided");
+
+  const TOKEN = process.env.TOKEN;
+
+  const transport = nodemailer.createTransport(
+    MailtrapTransport({
+      token: TOKEN as string,
+    }),
+  );
+
+  const sender = {
+    address: "verifyemail@shreyxsh.me",
+    name: "Verify Email | Iris",
+  };
+
+  const recipents = [email];
+
+  await transport.sendMail({
+    from: sender,
+    to: recipents,
+    subject: "Verify Your Email",
+    html: `<a href=${link}>Click here to verify</a>`,
+  });
 };

@@ -7,8 +7,10 @@ import {
   getTokens,
   logout,
   refreshTokens,
+  resendVerificationEmail,
   signin,
   signup,
+  verifyEmail,
 } from "./auth.services";
 import { join } from "node:path";
 import type { AuthenticatedRequest } from "../../common/utils/interfaces";
@@ -133,6 +135,32 @@ class AuthController {
         name,
         applicationUrl,
       });
+    } catch (error) {
+      ApiResponse.error(res, error);
+    }
+  }
+
+  static async handleResendVerificationEmail(
+    req: AuthenticatedRequest,
+    res: Response,
+  ) {
+    try {
+      const { email } = req.body;
+
+      await resendVerificationEmail(email);
+
+      ApiResponse.ok(res, "Verification email sent successfully");
+    } catch (error) {
+      ApiResponse.error(res, error);
+    }
+  }
+
+  static async handleVerifyEmail(req: Request, res: Response) {
+    try {
+      const token = req.query.token;
+      await verifyEmail(token as string);
+
+      ApiResponse.ok(res, "Email verified successfully");
     } catch (error) {
       ApiResponse.error(res, error);
     }

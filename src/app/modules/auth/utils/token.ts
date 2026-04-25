@@ -27,6 +27,18 @@ export function createRefreshToken(payload: { id: string }) {
   });
 }
 
+export function createEmailVerificationToken(payload: { id: string }) {
+  return JWT.sign(payload, process.env.JWT_EMAIL_VERIFICATION_SECRET!, {
+    expiresIn: "24h",
+  });
+}
+
+export function verifyEmailVerificationToken(token: string) {
+  return JWT.verify(token, process.env.JWT_EMAIL_VERIFICATION_SECRET!) as {
+    id: string;
+  };
+}
+
 export function verifyAccessToken(token: string) {
   return JWT.verify(token, PUBLIC_KEY, {
     algorithms: ["RS256"],
