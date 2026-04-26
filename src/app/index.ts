@@ -5,6 +5,7 @@ import adminRouter from "./modules/admin/admin.routes";
 
 export function createApplication() {
   const app = express();
+  const ISSUER = process.env.ISSUER || "http://localhost:8080";
 
   app.use(express.json());
   app.use("/auth", authRouter);
@@ -16,19 +17,11 @@ export function createApplication() {
 
   app.get("/.well-known/openid-configuration", (_, res) => {
     return res.status(200).json({
-      issuer: process.env.ISSUER || "http://localhost:8080",
-      authorization_endpoint:
-        `${process.env.ISSUER}/auth/authenticate` ||
-        "http://localhost:8080/auth/authenticate",
-      token_endpoint:
-        `${process.env.ISSUER}/auth/token` ||
-        "http://localhost:8080/auth/token",
-      userinfo_endpoint:
-        `${process.env.ISSUER}/auth/userinfo` ||
-        "http://localhost:8080/auth/userinfo",
-      jwks_uri:
-        `${process.env.ISSUER}/auth/certs` ||
-        "http://localhost:8080/auth/certs",
+      issuer: ISSUER,
+      authorization_endpoint: `${ISSUER}/auth/authenticate`,
+      token_endpoint: `${ISSUER}/auth/token`,
+      userinfo_endpoint: `${ISSUER}/auth/userinfo`,
+      jwks_uri: `${ISSUER}/auth/certs`,
       response_types_supported: ["code"],
       subject_types_supported: ["public"],
       id_token_signing_alg_values_supported: ["RS256"],
