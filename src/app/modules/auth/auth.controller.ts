@@ -15,7 +15,6 @@ import {
 import { join } from "node:path";
 import type { AuthenticatedRequest } from "../../common/utils/interfaces";
 import type { RefreshTokenPayload } from "./auth.models";
-import ApiError from "../../common/utils/api-error";
 
 class AuthController {
   private static PUBLIC_DIR = join(process.cwd(), "public");

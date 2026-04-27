@@ -297,7 +297,7 @@ export const verifyEmail = async (token: string) => {
 export const sendVerificationEmail = async (email: string, link: string) => {
   if (!email) throw ApiError.badRequest("No email provided");
 
-  const TOKEN = process.env.TOKEN;
+  const TOKEN = process.env.SMTP_TOKEN;
 
   const transport = nodemailer.createTransport(
     MailtrapTransport({
