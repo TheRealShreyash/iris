@@ -687,6 +687,13 @@
             throw new Error(err.message || "Sign in failed");
           }
 
+          const { data } = await res.json();
+          console.log(data);
+
+          if (data.redirectUri) {
+            window.location.href = data.redirectUri;
+          }
+
           btn.textContent = "Redirecting...";
           btn.style.background = "#d8d8d8";
         } catch (error) {
