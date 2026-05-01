@@ -5,7 +5,7 @@ import { createApplication } from "./app";
 async function main() {
   try {
     const server = http.createServer(createApplication());
-    const PORT = process.env.PORT || 8080;
+    const PORT = process.env.PORT || 9090;
 
     server.listen(PORT, () => {
       console.log(`
