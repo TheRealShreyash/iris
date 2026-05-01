@@ -21,7 +21,7 @@ class AuthController {
   static async handleCerts(_: Request, res: Response) {
     try {
       const jwks = await getJwks();
-      res.status(200).json(jwks);
+      res.status(200).json({ keys: jwks });
     } catch (error) {
       ApiResponse.error(res, error);
     }
@@ -60,7 +60,11 @@ class AuthController {
         url.searchParams.append("state", req.body.state);
       }
 
-      res.redirect(url.toString());
+      // res.redirect(url.toString());
+
+      ApiResponse.ok(res, "Redirect url found", {
+        redirectUri: url.toString(),
+      });
     } catch (error) {
       ApiResponse.error(res, error);
     }
