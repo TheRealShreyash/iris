@@ -222,7 +222,7 @@ export const refreshTokens = async (refreshToken: string) => {
   });
 
   const newHash = createHash("sha256")
-    .update(refreshToken as any)
+    .update(newRefreshToken as any)
     .digest("hex");
 
   await db
