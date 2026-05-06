@@ -439,6 +439,60 @@
         flex-shrink: 0;
         font-family: "Instrument Sans", sans-serif;
       }
+
+      /* ── Responsive ── */
+      @media (max-width: 600px) {
+        body {
+          padding: 1.5rem 1rem;
+          align-items: flex-start;
+        }
+        .wrap {
+          max-width: 100%;
+        }
+        .wordmark {
+          margin-bottom: 1.6rem;
+        }
+        .wordmark h1 {
+          font-size: 1.6rem;
+        }
+        .card {
+          padding: 1.6rem 1.2rem;
+        }
+        .card-head {
+          padding-bottom: 1.4rem;
+          margin-bottom: 1.4rem;
+        }
+        .card-head h2 {
+          font-size: 1.55rem;
+        }
+        .scopes {
+          grid-template-columns: repeat(2, 1fr);
+        }
+        .modal {
+          padding: 1.4rem 1.1rem;
+        }
+        .cred-value {
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 0.3rem;
+        }
+        .copy-hint {
+          margin-left: 0;
+        }
+      }
+
+      @media (max-width: 380px) {
+        .card {
+          padding: 1.2rem 0.9rem;
+        }
+        .scopes {
+          grid-template-columns: 1fr 1fr;
+        }
+        .field-top {
+          flex-direction: column;
+          gap: 0.15rem;
+        }
+      }
     </style>
   </head>
   <body>

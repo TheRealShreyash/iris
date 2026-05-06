@@ -480,6 +480,68 @@
       .error-banner.visible {
         display: block;
       }
+
+      /* ── Responsive ── */
+      @media (max-width: 600px) {
+        body {
+          padding: 1.5rem 1rem;
+          align-items: flex-start;
+        }
+        .wrap {
+          max-width: 100%;
+        }
+        .wordmark {
+          margin-bottom: 1.6rem;
+        }
+        .wordmark h1 {
+          font-size: 1.6rem;
+        }
+        .card {
+          padding: 1.6rem 1.2rem;
+        }
+        .card-head {
+          padding-bottom: 1.4rem;
+          margin-bottom: 1.4rem;
+        }
+        .card-head h2 {
+          font-size: 1.55rem;
+        }
+        .steps {
+          margin-bottom: 1.6rem;
+        }
+        .step-lbl {
+          display: none;
+        }
+        .app-banner {
+          padding: 0.65rem 0.8rem;
+          gap: 0.6rem;
+          margin-bottom: 1.3rem;
+        }
+        .field-row-2 {
+          grid-template-columns: 1fr;
+          gap: 0;
+        }
+        .social-row {
+          flex-direction: column;
+        }
+        .social-btn {
+          width: 100%;
+        }
+      }
+
+      @media (max-width: 380px) {
+        .card {
+          padding: 1.2rem 0.9rem;
+        }
+        .steps {
+          gap: 0;
+        }
+        .step-num {
+          width: 20px;
+          height: 20px;
+          font-size: 0.6rem;
+        }
+      }
     </style>
   </head>
   <body>
