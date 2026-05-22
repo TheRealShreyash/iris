@@ -1,9 +1,9 @@
 import { Router } from "express";
 import type { Request, Response } from "express";
 import { join } from "node:path";
-import AdminController from "./admin.controller";
-import validate from "../../common/middlewares/validate.middlware";
-import { clientRegisterPayloadModel } from "./admin.models";
+import AdminController from "./admin.controller.js";
+import validate from "../../common/middlewares/validate.middlware.js";
+import { clientRegisterPayloadModel } from "./admin.models.js";
 
 const PUBLIC_DIR = join(process.cwd(), "public");
 

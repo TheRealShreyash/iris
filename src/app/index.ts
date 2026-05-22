@@ -1,7 +1,7 @@
 import express from "express";
-import ApiResponse from "./common/utils/api-response";
-import authRouter from "./modules/auth/auth.routes";
-import adminRouter from "./modules/admin/admin.routes";
+import ApiResponse from "./common/utils/api-response.js";
+import authRouter from "./modules/auth/auth.routes.js";
+import adminRouter from "./modules/admin/admin.routes.js";
 
 export function createApplication() {
   const app = express();

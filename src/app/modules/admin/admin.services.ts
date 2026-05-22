@@ -1,9 +1,9 @@
 import { eq } from "drizzle-orm";
-import { db } from "../../../db/index";
-import { clientsTable } from "../../../db/schema";
-import ApiError from "../../common/utils/api-error";
+import { db } from "../../../db/index.js";
+import { clientsTable } from "../../../db/schema.js";
+import ApiError from "../../common/utils/api-error.js";
 import { randomBytes, createHash } from "node:crypto";
-import type { ClientRegisterPayload } from "./admin.models";
+import type { ClientRegisterPayload } from "./admin.models.js";
 
 export const registerClient = async (payload: ClientRegisterPayload) => {
   const { name, applicationUrl, redirectUri } = payload;

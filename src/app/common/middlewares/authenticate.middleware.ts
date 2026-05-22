@@ -1,8 +1,8 @@
 import type { Request, Response, NextFunction } from "express";
-import ApiError from "../utils/api-error";
-import ApiResponse from "../utils/api-response";
-import { verifyAccessToken } from "../../modules/auth/utils/token";
-import type { AuthenticatedRequest } from "../utils/interfaces";
+import ApiError from "../utils/api-error.js";
+import ApiResponse from "../utils/api-response.js";
+import { verifyAccessToken } from "../../modules/auth/utils/token.js";
+import type { AuthenticatedRequest } from "../utils/interfaces.js";
 
 export const authenticate = () => {
   return (req: AuthenticatedRequest, res: Response, next: NextFunction) => {

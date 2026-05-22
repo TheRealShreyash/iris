@@ -1,7 +1,7 @@
 import JWT from "jsonwebtoken";
 import { createHash } from "node:crypto";
-import type { UserTokenPayload } from "../auth.models";
-import { PRIVATE_KEY, PUBLIC_KEY } from "../../../../certs/keys";
+import type { UserTokenPayload } from "../auth.models.js";
+import { PRIVATE_KEY, PUBLIC_KEY } from "../../../../certs/keys.js";
 
 export function createAccessToken(payload: UserTokenPayload) {
   const kid = createHash("sha256")

@@ -1,6 +1,6 @@
-import ApiResponse from "../../common/utils/api-response";
+import ApiResponse from "../../common/utils/api-response.js";
 import type { Request, Response } from "express";
-import { registerClient } from "./admin.services";
+import { registerClient } from "./admin.services.js";
 
 class AdminController {
   static async handleRegisterClient(req: Request, res: Response) {

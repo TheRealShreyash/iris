@@ -1,21 +1,25 @@
 import { exportJWK, importSPKI } from "jose";
 import { createHash, createHmac, randomBytes } from "node:crypto";
-import { db } from "../../../db/index";
-import { authCodesTable, clientsTable, usersTable } from "../../../db/schema";
+import { db } from "../../../db/index.js";
+import {
+  authCodesTable,
+  clientsTable,
+  usersTable,
+} from "../../../db/schema.js";
 import { eq } from "drizzle-orm";
-import ApiError from "../../common/utils/api-error";
+import ApiError from "../../common/utils/api-error.js";
 import type {
   TokenRequestPayload,
   UserSigninPayload,
   UserSignupPayload,
-} from "./auth.models";
+} from "./auth.models.js";
 import {
   createAccessToken,
   createEmailVerificationToken,
   createRefreshToken,
   verifyEmailVerificationToken,
-} from "./utils/token";
-import { PUBLIC_KEY } from "../../../certs/keys";
+} from "./utils/token.js";
+import { PUBLIC_KEY } from "../../../certs/keys.js";
 import nodemailer from "nodemailer";
 import { MailtrapTransport } from "mailtrap";
 

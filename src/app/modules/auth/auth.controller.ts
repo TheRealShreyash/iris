@@ -1,5 +1,5 @@
 import type { Request, Response } from "express";
-import ApiResponse from "../../common/utils/api-response";
+import ApiResponse from "../../common/utils/api-response.js";
 import {
   clientExists,
   getClientMetadata,
@@ -11,10 +11,10 @@ import {
   signin,
   signup,
   verifyEmail,
-} from "./auth.services";
+} from "./auth.services.js";
 import { join } from "node:path";
-import type { AuthenticatedRequest } from "../../common/utils/interfaces";
-import type { RefreshTokenPayload } from "./auth.models";
+import type { AuthenticatedRequest } from "../../common/utils/interfaces.js";
+import type { RefreshTokenPayload } from "./auth.models.js";
 
 class AuthController {
   private static PUBLIC_DIR = join(process.cwd(), "public");

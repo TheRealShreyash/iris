@@ -1,5 +1,5 @@
 import type { Response } from "express";
-import ApiError from "./api-error";
+import ApiError from "./api-error.js";
 
 class ApiResponse {
   static ok(res: Response, message: string, data?: any) {
