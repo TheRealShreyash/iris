@@ -2,14 +2,22 @@
   "version": 2,
   "builds": [
     {
-      "src": "server/server.ts",
+      "src": "src/server.ts",
       "use": "@vercel/node"
     }
   ],
   "routes": [
     {
       "src": "/(.*)",
-      "dest": "server/server.ts"
+      "dest": "src/server.ts"
     }
-  ]
+  ],
+  "functions": {
+    "src/server.ts": {
+      "includeFiles": [
+        "src/certs/**",
+        "public/**"
+      ]
+    }
+  }
 }
