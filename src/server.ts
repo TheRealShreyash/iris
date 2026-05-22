@@ -1,6 +1,6 @@
 import http from "node:http";
 import "dotenv/config";
-import { createApplication } from "./app";
+import { createApplication } from "./app/index";
 
 async function main() {
   try {

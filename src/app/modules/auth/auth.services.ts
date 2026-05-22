@@ -1,6 +1,6 @@
 import { exportJWK, importSPKI } from "jose";
 import { createHash, createHmac, randomBytes } from "node:crypto";
-import { db } from "../../../db";
+import { db } from "../../../db/index";
 import { authCodesTable, clientsTable, usersTable } from "../../../db/schema";
 import { eq } from "drizzle-orm";
 import ApiError from "../../common/utils/api-error";

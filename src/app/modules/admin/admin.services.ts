@@ -1,5 +1,5 @@
 import { eq } from "drizzle-orm";
-import { db } from "../../../db";
+import { db } from "../../../db/index";
 import { clientsTable } from "../../../db/schema";
 import ApiError from "../../common/utils/api-error";
 import { randomBytes, createHash } from "node:crypto";
