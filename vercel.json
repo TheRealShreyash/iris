@@ -14,10 +14,7 @@
   ],
   "functions": {
     "src/server.ts": {
-      "includeFiles": [
-        "src/certs/**",
-        "public/**"
-      ]
+      "includeFiles": "{src/certs/**,public/**}"
     }
   }
 }
