@@ -5,10 +5,7 @@
       "src": "src/server.ts",
       "use": "@vercel/node",
       "config": {
-        "includeFiles": [
-          "src/certs/**",
-          "public/**"
-        ]
+        "includeFiles": ["src/certs/**", "public/**"]
       }
     }
   ],
