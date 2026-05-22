@@ -1,4 +1,8 @@
 import { readFileSync } from "node:fs";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
 
-export const PUBLIC_KEY = readFileSync(process.env.PUBLIC_KEY_PATH!, "utf-8");
-export const PRIVATE_KEY = readFileSync(process.env.PRIVATE_KEY_PATH!, "utf-8");
+const __dirname = dirname(fileURLToPath(import.meta.url));
+
+export const PUBLIC_KEY = readFileSync(join(__dirname, "private.pem"), "utf-8");
+export const PRIVATE_KEY = readFileSync(join(__dirname, "public.pem"), "utf-8");
