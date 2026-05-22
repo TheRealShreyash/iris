@@ -1,0 +1,1900 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Iris — Identity &amp; Access Platform</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Syne:wght@400;500;600;700;800&family=JetBrains+Mono:wght@300;400;500&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      :root {
+        --gold: #e4cc37;
+        --gold-dim: rgba(228, 204, 55, 0.18);
+        --gold-glow: rgba(228, 204, 55, 0.07);
+        --ink: #080808;
+        --ink2: #0e0e0e;
+        --ink3: #161616;
+        --border: rgba(255, 255, 255, 0.07);
+        --border-g: rgba(228, 204, 55, 0.22);
+        --text: #f2f2f0;
+        --muted: #555550;
+        --muted2: #888880;
+        --serif: "Cormorant Garamond", Georgia, serif;
+        --sans: "Syne", system-ui, sans-serif;
+        --mono: "JetBrains Mono", monospace;
+      }
+      html {
+        scroll-behavior: smooth;
+        -webkit-text-size-adjust: 100%;
+      }
+      body {
+        font-family: var(--sans);
+        background: var(--ink);
+        color: var(--text);
+        overflow-x: hidden;
+        min-height: 100vh;
+      }
+      @media (hover: hover) {
+        body {
+          cursor: none;
+        }
+      }
+      ::selection {
+        background: var(--gold);
+        color: var(--ink);
+      }
+
+      #cur,
+      #cur-r {
+        position: fixed;
+        z-index: 9999;
+        pointer-events: none;
+        border-radius: 50%;
+        transform: translate(-50%, -50%);
+      }
+      #cur {
+        width: 9px;
+        height: 9px;
+        background: var(--gold);
+        mix-blend-mode: difference;
+        transition:
+          width 0.25s,
+          height 0.25s;
+      }
+      #cur-r {
+        width: 34px;
+        height: 34px;
+        border: 1px solid rgba(228, 204, 55, 0.45);
+        transition:
+          width 0.3s,
+          height 0.3s,
+          opacity 0.3s;
+      }
+      @media (hover: none) {
+        #cur,
+        #cur-r {
+          display: none;
+        }
+      }
+
+      .noise {
+        position: fixed;
+        inset: 0;
+        z-index: 0;
+        pointer-events: none;
+        opacity: 0.026;
+        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      }
+      .gridbg {
+        position: fixed;
+        inset: 0;
+        z-index: 0;
+        pointer-events: none;
+        background-image:
+          linear-gradient(rgba(255, 255, 255, 0.022) 1px, transparent 1px),
+          linear-gradient(
+            90deg,
+            rgba(255, 255, 255, 0.022) 1px,
+            transparent 1px
+          );
+        background-size: 62px 62px;
+      }
+
+      nav {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 100;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 1rem 1.25rem;
+        border-bottom: 1px solid var(--border);
+        background: rgba(8, 8, 8, 0.88);
+        backdrop-filter: blur(22px) saturate(160%);
+        -webkit-backdrop-filter: blur(22px) saturate(160%);
+        transition: border-color 0.4s;
+      }
+      nav.sc {
+        border-bottom-color: rgba(228, 204, 55, 0.14);
+      }
+      .nb {
+        font-family: var(--serif);
+        font-weight: 300;
+        font-size: 1.55rem;
+        letter-spacing: 0.35em;
+        text-transform: uppercase;
+        color: #fff;
+        text-decoration: none;
+        position: relative;
+      }
+      .nb::after {
+        content: "·";
+        color: var(--gold);
+        position: absolute;
+        right: -0.35em;
+        bottom: 0.12em;
+        font-size: 0.45em;
+      }
+      .nl {
+        display: none;
+        list-style: none;
+        gap: 2rem;
+        align-items: center;
+      }
+      @media (min-width: 768px) {
+        .nl {
+          display: flex;
+        }
+      }
+      .nl a {
+        font-size: 0.68rem;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--muted2);
+        text-decoration: none;
+        transition: color 0.2s;
+        font-weight: 600;
+      }
+      .nl a:hover {
+        color: var(--gold);
+      }
+      .nr {
+        display: flex;
+        gap: 0.65rem;
+        align-items: center;
+      }
+      .bng,
+      .bny {
+        padding: 0.42rem 1rem;
+        font-family: var(--sans);
+        font-size: 0.67rem;
+        font-weight: 700;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        text-decoration: none;
+        cursor: pointer;
+        border-radius: 1px;
+        transition: all 0.2s;
+      }
+      .bng {
+        background: transparent;
+        border: 1px solid var(--border);
+        color: var(--muted2);
+      }
+      .bng:hover {
+        border-color: var(--border-g);
+        color: var(--gold);
+      }
+      .bny {
+        background: var(--gold);
+        border: 1px solid var(--gold);
+        color: var(--ink);
+      }
+      .bny:hover {
+        background: #f0d83e;
+        box-shadow: 0 0 28px rgba(228, 204, 55, 0.38);
+      }
+
+      .hero {
+        position: relative;
+        z-index: 1;
+        min-height: 100svh;
+        display: grid;
+        place-items: center;
+        padding: 7rem 1.25rem 5rem;
+        overflow: hidden;
+      }
+      .hbeam {
+        position: absolute;
+        top: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 1px;
+        height: 200px;
+        background: linear-gradient(
+          to bottom,
+          transparent,
+          var(--gold),
+          transparent
+        );
+        opacity: 0.42;
+      }
+      .hglow {
+        position: absolute;
+        top: -5%;
+        left: 50%;
+        transform: translateX(-50%);
+        width: min(680px, 100vw);
+        height: 500px;
+        background: radial-gradient(
+          ellipse at 50% 0%,
+          rgba(228, 204, 55, 0.065) 0%,
+          transparent 68%
+        );
+        pointer-events: none;
+      }
+      .hi {
+        max-width: 860px;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+      }
+      .hpill {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.55rem;
+        padding: 0.35rem 0.9rem 0.35rem 0.55rem;
+        border: 1px solid var(--border-g);
+        border-radius: 100px;
+        margin-bottom: 2.2rem;
+        font-size: 0.63rem;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--gold);
+        font-weight: 700;
+        background: rgba(228, 204, 55, 0.05);
+        opacity: 0;
+        animation: fu 0.7s 0.05s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+      }
+      .hdot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: var(--gold);
+        box-shadow: 0 0 7px var(--gold);
+        animation: blink 2s ease-in-out infinite;
+      }
+      @keyframes blink {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.3;
+        }
+      }
+      .htitle {
+        font-family: var(--serif);
+        font-weight: 300;
+        font-size: clamp(3rem, 13vw, 8rem);
+        line-height: 0.93;
+        letter-spacing: -0.01em;
+        color: #fff;
+        margin-bottom: 0.15em;
+        opacity: 0;
+        animation: fu 0.85s 0.18s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+      }
+      .hem {
+        font-style: italic;
+        color: var(--gold);
+        display: block;
+      }
+      .hsub {
+        font-family: var(--serif);
+        font-size: clamp(0.95rem, 2.5vw, 1.3rem);
+        font-weight: 300;
+        font-style: italic;
+        color: rgba(255, 255, 255, 0.3);
+        margin-bottom: 2.4rem;
+        opacity: 0;
+        animation: fu 0.85s 0.3s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+      }
+      .hdesc {
+        max-width: 500px;
+        font-size: clamp(0.8rem, 1.8vw, 0.9rem);
+        color: var(--muted2);
+        line-height: 1.88;
+        margin-bottom: 2.8rem;
+        opacity: 0;
+        animation: fu 0.85s 0.42s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+      }
+      .hact {
+        display: flex;
+        gap: 0.75rem;
+        flex-wrap: wrap;
+        justify-content: center;
+        margin-bottom: 4rem;
+        opacity: 0;
+        animation: fu 0.85s 0.54s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+      }
+      .bp {
+        padding: 0.82rem 2rem;
+        background: var(--gold);
+        border: 1px solid var(--gold);
+        border-radius: 1px;
+        color: var(--ink);
+        font-family: var(--sans);
+        font-size: 0.74rem;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        text-decoration: none;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.45rem;
+        transition: all 0.22s;
+      }
+      .bp:hover {
+        background: #f0d83e;
+        box-shadow: 0 0 32px rgba(228, 204, 55, 0.42);
+        transform: translateY(-1px);
+      }
+      .bp .arr {
+        transition: transform 0.2s;
+      }
+      .bp:hover .arr {
+        transform: translateX(3px);
+      }
+      .bo {
+        padding: 0.82rem 1.8rem;
+        background: transparent;
+        border: 1px solid var(--border);
+        border-radius: 1px;
+        color: var(--muted2);
+        font-family: var(--sans);
+        font-size: 0.74rem;
+        font-weight: 600;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        text-decoration: none;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.45rem;
+        transition: all 0.22s;
+      }
+      .bo:hover {
+        border-color: var(--border-g);
+        color: var(--gold);
+      }
+
+      .hcode {
+        width: 100%;
+        max-width: 600px;
+        opacity: 0;
+        animation: fu 1s 0.66s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+      }
+      .cbar {
+        background: var(--ink3);
+        border: 1px solid var(--border);
+        border-bottom: none;
+        border-radius: 2px 2px 0 0;
+        padding: 0.65rem 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.45rem;
+      }
+      .dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+      }
+      .d1 {
+        background: #ff5f57;
+      }
+      .d2 {
+        background: #febc2e;
+      }
+      .d3 {
+        background: #28c840;
+      }
+      .cfn {
+        font-family: var(--mono);
+        font-size: 0.6rem;
+        color: var(--muted);
+        letter-spacing: 0.06em;
+        margin-left: 0.4rem;
+      }
+      .cbody {
+        background: rgba(6, 6, 6, 0.94);
+        border: 1px solid var(--border);
+        border-radius: 0 0 2px 2px;
+        padding: 1.3rem 1.5rem;
+        text-align: left;
+        position: relative;
+        overflow: hidden;
+      }
+      .cbody::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 1px;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          var(--gold-dim),
+          transparent
+        );
+      }
+      .cl {
+        font-family: var(--mono);
+        font-size: clamp(0.62rem, 1.8vw, 0.71rem);
+        line-height: 1.95;
+        letter-spacing: 0.02em;
+        white-space: nowrap;
+        overflow-x: auto;
+      }
+      .tc {
+        color: rgba(255, 255, 255, 0.2);
+      }
+      .tk {
+        color: #a78bfa;
+      }
+      .ts {
+        color: var(--gold);
+      }
+      .tp {
+        color: rgba(255, 255, 255, 0.25);
+      }
+      .tm {
+        color: #34d399;
+      }
+
+      .schin {
+        position: absolute;
+        bottom: 2rem;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.4rem;
+        font-size: 0.56rem;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: var(--muted);
+        opacity: 0;
+        animation: fu 1s 1.5s ease forwards;
+      }
+      .scl {
+        width: 1px;
+        height: 38px;
+        background: linear-gradient(
+          to bottom,
+          transparent,
+          rgba(228, 204, 55, 0.5),
+          transparent
+        );
+        animation: sa 2.2s ease-in-out infinite;
+      }
+      @keyframes sa {
+        0%,
+        100% {
+          opacity: 0.35;
+          transform: scaleY(1);
+        }
+        50% {
+          opacity: 1;
+          transform: scaleY(1.3);
+        }
+      }
+      @keyframes fu {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .mqw {
+        position: relative;
+        z-index: 1;
+        border-top: 1px solid var(--border);
+        border-bottom: 1px solid var(--border);
+        padding: 1rem 0;
+        overflow: hidden;
+        background: var(--ink2);
+      }
+      .mqt {
+        display: flex;
+        gap: 3rem;
+        width: max-content;
+        animation: mqani 26s linear infinite;
+      }
+      .mqi {
+        font-family: var(--mono);
+        font-size: 0.63rem;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--muted);
+        white-space: nowrap;
+        display: flex;
+        align-items: center;
+        gap: 0.65rem;
+        flex-shrink: 0;
+      }
+      .mqi::before {
+        content: "◆";
+        font-size: 0.38rem;
+        color: var(--gold);
+      }
+      @keyframes mqani {
+        0% {
+          transform: translateX(0);
+        }
+        100% {
+          transform: translateX(-50%);
+        }
+      }
+
+      section {
+        position: relative;
+        z-index: 1;
+      }
+      .si {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 0 1.25rem;
+      }
+      @media (min-width: 768px) {
+        .si {
+          padding: 0 2.5rem;
+        }
+      }
+      .ey {
+        font-size: 0.6rem;
+        letter-spacing: 0.22em;
+        text-transform: uppercase;
+        color: var(--gold);
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+        margin-bottom: 1.1rem;
+      }
+      .ey::before {
+        content: "";
+        width: 16px;
+        height: 1px;
+        background: var(--gold);
+      }
+      .st {
+        font-family: var(--serif);
+        font-weight: 300;
+        font-size: clamp(1.9rem, 5.5vw, 3.6rem);
+        line-height: 1.06;
+        letter-spacing: -0.02em;
+        color: #fff;
+        margin-bottom: 1rem;
+      }
+      .st em {
+        font-style: italic;
+        color: rgba(255, 255, 255, 0.28);
+      }
+      .sl {
+        font-size: 0.87rem;
+        color: var(--muted2);
+        line-height: 1.85;
+        max-width: 480px;
+      }
+
+      .rev {
+        opacity: 0;
+        transform: translateY(26px);
+        transition:
+          opacity 0.72s cubic-bezier(0.22, 1, 0.36, 1),
+          transform 0.72s cubic-bezier(0.22, 1, 0.36, 1);
+      }
+      .rev.in {
+        opacity: 1;
+        transform: translateY(0);
+      }
+      .d1x {
+        transition-delay: 0.07s;
+      }
+      .d2x {
+        transition-delay: 0.14s;
+      }
+      .d3x {
+        transition-delay: 0.21s;
+      }
+      .d4x {
+        transition-delay: 0.28s;
+      }
+      .d5x {
+        transition-delay: 0.35s;
+      }
+      .d6x {
+        transition-delay: 0.42s;
+      }
+
+      .stats {
+        padding: 4.5rem 0;
+        border-bottom: 1px solid var(--border);
+      }
+      .sg {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0;
+      }
+      @media (min-width: 768px) {
+        .sg {
+          grid-template-columns: repeat(4, 1fr);
+        }
+      }
+      .stat {
+        padding: 2rem 1.4rem;
+        border-right: 1px solid var(--border);
+        border-bottom: 1px solid var(--border);
+        transition: background 0.3s;
+        cursor: default;
+      }
+      .stat:nth-child(2n) {
+        border-right: none;
+      }
+      @media (min-width: 768px) {
+        .stat {
+          padding: 2.6rem 2rem;
+          border-bottom: none;
+        }
+        .stat:nth-child(2n) {
+          border-right: 1px solid var(--border);
+        }
+        .stat:last-child {
+          border-right: none;
+        }
+      }
+      .stat:hover {
+        background: rgba(228, 204, 55, 0.024);
+      }
+      .snum {
+        font-family: var(--serif);
+        font-weight: 300;
+        font-size: clamp(2.3rem, 6vw, 3.5rem);
+        line-height: 1;
+        letter-spacing: -0.03em;
+        color: #fff;
+        margin-bottom: 0.35rem;
+      }
+      .snum span {
+        color: var(--gold);
+      }
+      .slab {
+        font-size: 0.62rem;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--muted);
+        font-weight: 700;
+        margin-bottom: 0.3rem;
+      }
+      .sdesc {
+        font-size: 0.73rem;
+        color: var(--muted2);
+        line-height: 1.5;
+      }
+
+      .features {
+        padding: 5.5rem 0 7rem;
+        border-bottom: 1px solid var(--border);
+      }
+      .fh {
+        display: grid;
+        gap: 1.8rem;
+        margin-bottom: 3.5rem;
+      }
+      @media (min-width: 768px) {
+        .fh {
+          grid-template-columns: 1fr 1fr;
+          align-items: end;
+          gap: 4rem;
+        }
+      }
+      .fg {
+        display: grid;
+        gap: 1px;
+        background: var(--border);
+        border: 1px solid var(--border);
+      }
+      @media (min-width: 580px) {
+        .fg {
+          grid-template-columns: repeat(2, 1fr);
+        }
+      }
+      @media (min-width: 900px) {
+        .fg {
+          grid-template-columns: repeat(3, 1fr);
+        }
+      }
+      .fc {
+        background: var(--ink);
+        padding: 2rem 1.8rem;
+        transition: background 0.3s;
+        position: relative;
+        overflow: hidden;
+        cursor: default;
+      }
+      .fc::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(
+          circle at 0 0,
+          rgba(228, 204, 55, 0.055) 0%,
+          transparent 65%
+        );
+        opacity: 0;
+        transition: opacity 0.35s;
+      }
+      .fc:hover {
+        background: var(--ink2);
+      }
+      .fc:hover::after {
+        opacity: 1;
+      }
+      .ficon {
+        width: 36px;
+        height: 36px;
+        border: 1px solid var(--border);
+        border-radius: 1px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1rem;
+        margin-bottom: 1.4rem;
+        transition: border-color 0.3s;
+        position: relative;
+        z-index: 1;
+      }
+      .fc:hover .ficon {
+        border-color: var(--border-g);
+      }
+      .fname {
+        font-family: var(--serif);
+        font-size: 1.25rem;
+        font-weight: 400;
+        color: rgba(255, 255, 255, 0.88);
+        margin-bottom: 0.65rem;
+        position: relative;
+        z-index: 1;
+      }
+      .fdesc {
+        font-size: 0.76rem;
+        color: var(--muted2);
+        line-height: 1.78;
+        position: relative;
+        z-index: 1;
+      }
+      .ftag {
+        display: inline-block;
+        margin-top: 1.1rem;
+        font-family: var(--mono);
+        font-size: 0.57rem;
+        color: var(--gold);
+        border: 1px solid rgba(228, 204, 55, 0.22);
+        padding: 0.17rem 0.52rem;
+        border-radius: 1px;
+        letter-spacing: 0.06em;
+        position: relative;
+        z-index: 1;
+      }
+
+      .how {
+        padding: 6.5rem 0;
+        border-bottom: 1px solid var(--border);
+      }
+      .hwg {
+        display: grid;
+        gap: 0;
+        margin-top: 3.5rem;
+        border: 1px solid var(--border);
+      }
+      @media (min-width: 768px) {
+        .hwg {
+          grid-template-columns: repeat(4, 1fr);
+        }
+      }
+      .hs {
+        padding: 2.2rem 1.8rem;
+        border-bottom: 1px solid var(--border);
+        position: relative;
+        transition: background 0.25s;
+        cursor: default;
+      }
+      @media (min-width: 768px) {
+        .hs {
+          border-bottom: none;
+          border-right: 1px solid var(--border);
+        }
+        .hs:last-child {
+          border-right: none;
+        }
+      }
+      .hs:hover {
+        background: var(--ink2);
+      }
+      .hnum {
+        font-family: var(--serif);
+        font-weight: 300;
+        font-size: 5rem;
+        line-height: 1;
+        color: rgba(255, 255, 255, 0.04);
+        letter-spacing: -0.04em;
+        margin-bottom: 0.7rem;
+        user-select: none;
+      }
+      .htit {
+        font-family: var(--serif);
+        font-size: 1.2rem;
+        font-weight: 400;
+        color: rgba(255, 255, 255, 0.85);
+        margin-bottom: 0.6rem;
+      }
+      .hdsc {
+        font-size: 0.75rem;
+        color: var(--muted2);
+        line-height: 1.75;
+      }
+      .hbdg {
+        display: inline-block;
+        margin-top: 0.9rem;
+        font-family: var(--mono);
+        font-size: 0.57rem;
+        color: var(--gold);
+        border: 1px solid rgba(228, 204, 55, 0.2);
+        padding: 0.17rem 0.5rem;
+        border-radius: 1px;
+        letter-spacing: 0.08em;
+      }
+      code.ic {
+        font-family: var(--mono);
+        font-size: 0.72em;
+        color: var(--gold);
+        background: rgba(228, 204, 55, 0.08);
+        padding: 0.1em 0.38em;
+        border-radius: 1px;
+      }
+
+      .proto {
+        padding: 6.5rem 0;
+        border-bottom: 1px solid var(--border);
+      }
+      .plo {
+        display: grid;
+        gap: 2.5rem;
+        margin-top: 3rem;
+        align-items: start;
+      }
+      @media (min-width: 900px) {
+        .plo {
+          grid-template-columns: 1.1fr 1fr;
+          gap: 4.5rem;
+        }
+      }
+      .pd {
+        border: 1px solid var(--border);
+        border-radius: 2px;
+        background: rgba(6, 6, 6, 0.9);
+        overflow: hidden;
+        position: relative;
+      }
+      .pd::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 1px;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          var(--gold-dim),
+          transparent
+        );
+      }
+      .phd {
+        font-family: var(--mono);
+        font-size: 0.58rem;
+        color: var(--muted);
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        padding: 0.9rem 1.2rem;
+        border-bottom: 1px solid var(--border);
+      }
+      .fr {
+        display: flex;
+        align-items: center;
+        gap: 0.65rem;
+        padding: 0.8rem 1.2rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+        transition: background 0.2s;
+      }
+      .fr:last-child {
+        border-bottom: none;
+      }
+      .fr:hover {
+        background: rgba(228, 204, 55, 0.03);
+      }
+      .fa {
+        font-family: var(--mono);
+        font-size: 0.65rem;
+        color: var(--gold);
+        width: 18px;
+        flex-shrink: 0;
+      }
+      .ff {
+        font-family: var(--mono);
+        font-size: 0.61rem;
+        color: rgba(255, 255, 255, 0.28);
+        width: 55px;
+        flex-shrink: 0;
+      }
+      .fm {
+        font-family: var(--mono);
+        font-size: 0.61rem;
+        color: rgba(255, 255, 255, 0.68);
+        flex: 1;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .fm.g {
+        color: var(--gold);
+      }
+      .fm.d {
+        color: rgba(255, 255, 255, 0.2);
+      }
+      .psteps {
+        display: flex;
+        flex-direction: column;
+        gap: 1.8rem;
+      }
+      .psi {
+        display: flex;
+        gap: 1rem;
+        align-items: flex-start;
+      }
+      .psn {
+        font-family: var(--mono);
+        font-size: 0.58rem;
+        color: var(--gold);
+        border: 1px solid rgba(228, 204, 55, 0.28);
+        width: 24px;
+        height: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        border-radius: 1px;
+      }
+      .pstit {
+        font-family: var(--serif);
+        font-size: 1.05rem;
+        color: rgba(255, 255, 255, 0.85);
+        margin-bottom: 0.28rem;
+      }
+      .psdesc {
+        font-size: 0.75rem;
+        color: var(--muted2);
+        line-height: 1.72;
+      }
+
+      .quote {
+        padding: 6rem 0;
+        border-bottom: 1px solid var(--border);
+        text-align: center;
+      }
+      .qm {
+        font-family: var(--serif);
+        font-size: 5rem;
+        color: var(--gold);
+        opacity: 0.38;
+        line-height: 0.65;
+        margin-bottom: 1.5rem;
+        user-select: none;
+      }
+      .qt {
+        font-family: var(--serif);
+        font-weight: 300;
+        font-style: italic;
+        font-size: clamp(1.4rem, 3.5vw, 2.4rem);
+        line-height: 1.3;
+        letter-spacing: -0.01em;
+        color: rgba(255, 255, 255, 0.78);
+        max-width: 780px;
+        margin: 0 auto 1.8rem;
+      }
+      .qt em {
+        color: var(--gold);
+        font-style: normal;
+      }
+      .qc {
+        font-size: 0.7rem;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--muted);
+        font-weight: 700;
+      }
+
+      .trust {
+        padding: 4.5rem 0;
+        border-bottom: 1px solid var(--border);
+        text-align: center;
+      }
+      .tlab {
+        font-size: 0.6rem;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: var(--muted);
+        margin-bottom: 2.2rem;
+        font-weight: 700;
+      }
+      .tg {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1.8rem 3rem;
+        justify-content: center;
+        align-items: center;
+      }
+      .tlo {
+        font-family: var(--serif);
+        font-size: 1.35rem;
+        font-weight: 300;
+        letter-spacing: 0.15em;
+        text-transform: uppercase;
+        color: rgba(255, 255, 255, 0.1);
+        transition: color 0.3s;
+        cursor: default;
+      }
+      .tlo:hover {
+        color: rgba(255, 255, 255, 0.28);
+      }
+
+      .cta {
+        padding: 8rem 0;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+      }
+      .cglow {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: min(750px, 120vw);
+        height: 380px;
+        background: radial-gradient(
+          ellipse,
+          rgba(228, 204, 55, 0.07) 0%,
+          transparent 70%
+        );
+        pointer-events: none;
+      }
+      .cgrid {
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        background-image:
+          linear-gradient(rgba(228, 204, 55, 0.03) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(228, 204, 55, 0.03) 1px, transparent 1px);
+        background-size: 50px 50px;
+      }
+      .ctitle {
+        font-family: var(--serif);
+        font-weight: 300;
+        font-size: clamp(2.4rem, 8vw, 5.5rem);
+        line-height: 0.97;
+        letter-spacing: -0.02em;
+        color: #fff;
+        margin-bottom: 1.3rem;
+        position: relative;
+        z-index: 1;
+      }
+      .ctitle em {
+        font-style: italic;
+        color: var(--gold);
+      }
+      .csub {
+        font-size: 0.88rem;
+        color: var(--muted2);
+        line-height: 1.8;
+        max-width: 420px;
+        margin: 0 auto 2.8rem;
+        position: relative;
+        z-index: 1;
+      }
+      .cbtns {
+        display: flex;
+        gap: 0.8rem;
+        justify-content: center;
+        flex-wrap: wrap;
+        position: relative;
+        z-index: 1;
+      }
+      .bcg {
+        padding: 0.95rem 2.4rem;
+        background: var(--gold);
+        border: 1px solid var(--gold);
+        border-radius: 1px;
+        color: var(--ink);
+        font-family: var(--sans);
+        font-size: 0.76rem;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        text-decoration: none;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.45rem;
+        transition: all 0.22s;
+      }
+      .bcg:hover {
+        background: #f0d83e;
+        box-shadow: 0 0 40px rgba(228, 204, 55, 0.45);
+        transform: translateY(-2px);
+      }
+      .bco {
+        padding: 0.95rem 2rem;
+        background: transparent;
+        border: 1px solid var(--border);
+        border-radius: 1px;
+        color: var(--muted2);
+        font-family: var(--sans);
+        font-size: 0.76rem;
+        font-weight: 600;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        text-decoration: none;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        transition: all 0.22s;
+      }
+      .bco:hover {
+        border-color: var(--border-g);
+        color: var(--gold);
+      }
+
+      footer {
+        border-top: 1px solid var(--border);
+        padding: 3.5rem 0 2rem;
+        position: relative;
+        z-index: 1;
+        background: var(--ink2);
+      }
+      .fgd {
+        display: grid;
+        gap: 2.5rem;
+      }
+      @media (min-width: 600px) {
+        .fgd {
+          grid-template-columns: 1.4fr 1fr 1fr 1fr;
+          gap: 3rem;
+        }
+      }
+      .fbn {
+        font-family: var(--serif);
+        font-weight: 300;
+        font-size: 1.45rem;
+        letter-spacing: 0.3em;
+        text-transform: uppercase;
+        color: #fff;
+        margin-bottom: 0.28rem;
+      }
+      .fbs {
+        font-size: 0.58rem;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: var(--muted);
+        margin-bottom: 1.1rem;
+        font-weight: 700;
+      }
+      .fbd {
+        font-size: 0.76rem;
+        color: var(--muted2);
+        line-height: 1.75;
+        max-width: 250px;
+      }
+      .fcol h4 {
+        font-size: 0.58rem;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--muted);
+        font-weight: 700;
+        margin-bottom: 1.1rem;
+      }
+      .fcol ul {
+        list-style: none;
+        display: flex;
+        flex-direction: column;
+        gap: 0.65rem;
+      }
+      .fcol a {
+        font-size: 0.77rem;
+        color: var(--muted2);
+        text-decoration: none;
+        transition: color 0.2s;
+      }
+      .fcol a:hover {
+        color: var(--gold);
+      }
+      .fbot {
+        margin-top: 2.8rem;
+        padding-top: 1.4rem;
+        border-top: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 1rem;
+        font-size: 0.65rem;
+        color: var(--muted);
+      }
+      .fbdgs {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+      }
+      .fbdg {
+        font-family: var(--mono);
+        font-size: 0.57rem;
+        border: 1px solid var(--border);
+        padding: 0.17rem 0.52rem;
+        border-radius: 1px;
+        color: var(--muted);
+        letter-spacing: 0.06em;
+        transition:
+          border-color 0.2s,
+          color 0.2s;
+      }
+      .fbdg:hover {
+        border-color: var(--border-g);
+        color: var(--gold);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="cur"></div>
+    <div id="cur-r"></div>
+    <div class="noise" aria-hidden="true"></div>
+    <div class="gridbg" aria-hidden="true"></div>
+
+    <nav id="nav">
+      <a href="/" class="nb">Iris</a>
+      <ul class="nl">
+        <li><a href="#features">Features</a></li>
+        <li><a href="#how">Flow</a></li>
+        <li><a href="#protocol">Protocol</a></li>
+        <li><a href="#">Docs</a></li>
+      </ul>
+      <div class="nr">
+        <a href="/auth/authenticate" class="bng">Sign in</a>
+        <a href="/auth/authenticate/signup" class="bny">Get started</a>
+      </div>
+    </nav>
+
+    <section class="hero">
+      <div class="hbeam" aria-hidden="true"></div>
+      <div class="hglow" aria-hidden="true"></div>
+      <div class="hi">
+        <div class="hpill">
+          <div class="hdot" aria-hidden="true"></div>
+          OAuth 2.0 + OpenID Connect — Now GA
+        </div>
+        <h1 class="htitle">
+          One identity.<br /><span class="hem">Every service.</span>
+        </h1>
+        <p class="hsub">The authentication layer your users deserve</p>
+        <p class="hdesc">
+          Iris is a secure, standards-compliant identity platform built on
+          OAuth&nbsp;2.0 and OpenID&nbsp;Connect. Drop-in auth for any
+          application — tokens in under&nbsp;50ms, zero configuration hell.
+        </p>
+        <div class="hact">
+          <a href="/auth/authenticate/signup" class="bp"
+            >Start building <span class="arr">&#x2192;</span></a
+          >
+          <a href="#" class="bo">Read the docs</a>
+        </div>
+        <div class="hcode">
+          <div class="cbar" aria-hidden="true">
+            <div class="dot d1"></div>
+            <div class="dot d2"></div>
+            <div class="dot d3"></div>
+            <span class="cfn">authorize.http</span>
+          </div>
+          <div class="cbody">
+            <div class="cl">
+              <span class="tc">// PKCE Authorization Code Flow</span>
+            </div>
+            <div class="cl">
+              <span class="tm">GET</span>
+              <span class="ts">https://iris.auth/authorize</span>
+            </div>
+            <div class="cl">
+              &nbsp;&nbsp;<span class="tk">?client_id</span
+              ><span class="tp">=</span><span class="ts">your_client_id</span>
+            </div>
+            <div class="cl">
+              &nbsp;&nbsp;<span class="tk">&amp;response_type</span
+              ><span class="tp">=</span><span class="ts">code</span>
+            </div>
+            <div class="cl">
+              &nbsp;&nbsp;<span class="tk">&amp;scope</span
+              ><span class="tp">=</span
+              ><span class="ts">openid profile email</span>
+            </div>
+            <div class="cl">
+              &nbsp;&nbsp;<span class="tk">&amp;code_challenge_method</span
+              ><span class="tp">=</span><span class="ts">S256</span>
+            </div>
+            <div class="cl">
+              &nbsp;&nbsp;<span class="tk">&amp;redirect_uri</span
+              ><span class="tp">=</span
+              ><span class="ts">https://your.app/callback</span>
+            </div>
+            <div class="cl">&nbsp;</div>
+            <div class="cl">
+              <span class="tc"
+                >// &#x2190; Tokens signed &amp; issued in &lt;50ms
+                &#x2713;</span
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="schin" aria-hidden="true">
+        <div class="scl"></div>
+        Scroll
+      </div>
+    </section>
+
+    <div class="mqw" aria-hidden="true">
+      <div class="mqt">
+        <span class="mqi">OAuth 2.0</span><span class="mqi">OpenID Connect</span
+        ><span class="mqi">PKCE &middot; RFC 7636</span
+        ><span class="mqi">JWT &middot; RS256</span
+        ><span class="mqi">SOC 2 Type II</span
+        ><span class="mqi">Multi-tenant</span
+        ><span class="mqi">Sub-50ms tokens</span
+        ><span class="mqi">JWKS endpoint</span
+        ><span class="mqi">Authorization Code Flow</span
+        ><span class="mqi">Scope &amp; Consent</span
+        ><span class="mqi">Token Rotation</span
+        ><span class="mqi">UserInfo endpoint</span>
+        <span class="mqi">OAuth 2.0</span><span class="mqi">OpenID Connect</span
+        ><span class="mqi">PKCE &middot; RFC 7636</span
+        ><span class="mqi">JWT &middot; RS256</span
+        ><span class="mqi">SOC 2 Type II</span
+        ><span class="mqi">Multi-tenant</span
+        ><span class="mqi">Sub-50ms tokens</span
+        ><span class="mqi">JWKS endpoint</span
+        ><span class="mqi">Authorization Code Flow</span
+        ><span class="mqi">Scope &amp; Consent</span
+        ><span class="mqi">Token Rotation</span
+        ><span class="mqi">UserInfo endpoint</span>
+      </div>
+    </div>
+
+    <section class="stats">
+      <div class="si">
+        <div class="sg">
+          <div class="stat rev d1x">
+            <div class="snum">&lt;<span>50</span>ms</div>
+            <div class="slab">Token latency</div>
+            <div class="sdesc">Global edge nodes, P99 guaranteed.</div>
+          </div>
+          <div class="stat rev d2x">
+            <div class="snum">99.<span>99</span>%</div>
+            <div class="slab">Uptime SLA</div>
+            <div class="sdesc">Active-active multi-region failover.</div>
+          </div>
+          <div class="stat rev d3x">
+            <div class="snum">SOC<span>2</span></div>
+            <div class="slab">Type II certified</div>
+            <div class="sdesc">Independently audited annually.</div>
+          </div>
+          <div class="stat rev d4x">
+            <div class="snum"><span>&#x221E;</span></div>
+            <div class="slab">Applications</div>
+            <div class="sdesc">Unlimited apps per tenant, isolated.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="features" id="features">
+      <div class="si">
+        <div class="fh">
+          <div class="rev">
+            <div class="ey">Platform</div>
+            <h2 class="st">
+              Built on standards.<br /><em>Trusted by design.</em>
+            </h2>
+          </div>
+          <p class="sl rev d2x">
+            Every primitive you need &#x2014; PKCE flows, scoped tokens, consent
+            screens, JWKS rotation &#x2014; production-ready and interoperable
+            with any OIDC client library.
+          </p>
+        </div>
+        <div class="fg">
+          <div class="fc rev d1x">
+            <div class="ficon">&#x1F510;</div>
+            <div class="fname">PKCE Authorization</div>
+            <p class="fdesc">
+              Code exchange with a cryptographic challenge. Prevents
+              interception attacks for public clients by design.
+            </p>
+            <span class="ftag">RFC 7636</span>
+          </div>
+          <div class="fc rev d2x">
+            <div class="ficon">&#x1FAAA;</div>
+            <div class="fname">OpenID Connect</div>
+            <p class="fdesc">
+              Full OIDC Core 1.0. ID tokens, UserInfo endpoint, discovery
+              document, and JWKS &#x2014; all standard, all interoperable.
+            </p>
+            <span class="ftag">OIDC Core 1.0</span>
+          </div>
+          <div class="fc rev d3x">
+            <div class="ficon">&#x1F310;</div>
+            <div class="fname">Multi-tenant</div>
+            <p class="fdesc">
+              Complete per-tenant isolation. User pools, branding, config
+              &#x2014; all scoped. Zero noisy-neighbour risk.
+            </p>
+            <span class="ftag">Isolated namespaces</span>
+          </div>
+          <div class="fc rev d4x">
+            <div class="ficon">&#x26A1;</div>
+            <div class="fname">Edge-fast Tokens</div>
+            <p class="fdesc">
+              Globally distributed signing nodes issue tokens close to your
+              users. Auth is never your bottleneck.
+            </p>
+            <span class="ftag">Global edge</span>
+          </div>
+          <div class="fc rev d5x">
+            <div class="ficon">&#x1F511;</div>
+            <div class="fname">Scope &amp; Consent</div>
+            <p class="fdesc">
+              Granular scope definitions with polished consent screens. Users
+              see exactly what they authorise.
+            </p>
+            <span class="ftag">OAuth Scopes</span>
+          </div>
+          <div class="fc rev d6x">
+            <div class="ficon">&#x1F6E1;&#xFE0F;</div>
+            <div class="fname">SOC 2 Type II</div>
+            <p class="fdesc">
+              Independently audited security, availability, and confidentiality
+              controls. Enterprise trust, day one.
+            </p>
+            <span class="ftag">Annual audit</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="how" id="how">
+      <div class="si">
+        <div class="rev">
+          <div class="ey">Integration flow</div>
+          <h2 class="st">Ship auth in<br /><em>four steps.</em></h2>
+        </div>
+        <div class="hwg rev">
+          <div class="hs">
+            <div class="hnum">01</div>
+            <div class="htit">Register your app</div>
+            <p class="hdsc">
+              Create a client on the Iris console. Set redirect URIs, allowed
+              scopes, grant types. Get credentials instantly.
+            </p>
+            <span class="hbdg">client_id issued</span>
+          </div>
+          <div class="hs">
+            <div class="hnum">02</div>
+            <div class="htit">Redirect to Iris</div>
+            <p class="hdsc">
+              Send users to <code class="ic">/authorize</code> with your client
+              ID, PKCE challenge, scopes, and redirect URI.
+            </p>
+            <span class="hbdg">GET /authorize</span>
+          </div>
+          <div class="hs">
+            <div class="hnum">03</div>
+            <div class="htit">User authenticates</div>
+            <p class="hdsc">
+              Iris handles login UI and consent. A short-lived auth code is
+              issued and returned to your redirect URI.
+            </p>
+            <span class="hbdg">code returned</span>
+          </div>
+          <div class="hs">
+            <div class="hnum">04</div>
+            <div class="htit">Exchange for tokens</div>
+            <p class="hdsc">
+              Server exchanges code for signed JWTs &#x2014; ID token, access
+              token, refresh token. Verify with JWKS.
+            </p>
+            <span class="hbdg">POST /token</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="proto" id="protocol">
+      <div class="si">
+        <div class="rev">
+          <div class="ey">OIDC Protocol</div>
+          <h2 class="st">Standards-compliant<br /><em>by design.</em></h2>
+        </div>
+        <div class="plo">
+          <div class="pd rev d1x">
+            <div class="phd">Authorization Code + PKCE &#x2014; full flow</div>
+            <div class="fr">
+              <span class="fa">&#x2192;</span><span class="ff">Client</span
+              ><span class="fm g">GET /authorize?code_challenge=&#x2026;</span>
+            </div>
+            <div class="fr">
+              <span class="fa">&#x21B7;</span><span class="ff">Browser</span
+              ><span class="fm d">Redirect &#x2192; Iris login UI</span>
+            </div>
+            <div class="fr">
+              <span class="fa">&#x2192;</span><span class="ff">User</span
+              ><span class="fm">Authenticates + approves scopes</span>
+            </div>
+            <div class="fr">
+              <span class="fa">&#x2190;</span><span class="ff">Iris</span
+              ><span class="fm d">302 &#x2192; redirect_uri?code=auth_xyz</span>
+            </div>
+            <div class="fr">
+              <span class="fa">&#x2192;</span><span class="ff">Server</span
+              ><span class="fm g">POST /token + code_verifier</span>
+            </div>
+            <div class="fr">
+              <span class="fa">&#x2190;</span><span class="ff">Iris</span
+              ><span class="fm">{ id_token, access_token, refresh_token }</span>
+            </div>
+            <div class="fr">
+              <span class="fa">&#x2192;</span><span class="ff">Server</span
+              ><span class="fm d">GET /userinfo Bearer access_token</span>
+            </div>
+            <div class="fr">
+              <span class="fa">&#x2190;</span><span class="ff">Iris</span
+              ><span class="fm g">{ sub, email, name, picture }</span>
+            </div>
+          </div>
+          <div class="psteps rev d2x">
+            <div class="psi">
+              <div class="psn">01</div>
+              <div>
+                <div class="pstit">Authorization request</div>
+                <p class="psdesc">
+                  Client sends PKCE challenge and scopes to
+                  <code class="ic">/authorize</code>. Iris validates the client
+                  registration before proceeding.
+                </p>
+              </div>
+            </div>
+            <div class="psi">
+              <div class="psn">02</div>
+              <div>
+                <div class="pstit">Authentication &amp; consent</div>
+                <p class="psdesc">
+                  Iris presents the login UI. User authenticates and reviews the
+                  requested scope. A short-lived authorization code is issued.
+                </p>
+              </div>
+            </div>
+            <div class="psi">
+              <div class="psn">03</div>
+              <div>
+                <div class="pstit">Token exchange</div>
+                <p class="psdesc">
+                  Your server posts the code and PKCE verifier to
+                  <code class="ic">/token</code>. Iris verifies the challenge
+                  and issues signed JWTs in under 50ms.
+                </p>
+              </div>
+            </div>
+            <div class="psi">
+              <div class="psn">04</div>
+              <div>
+                <div class="pstit">UserInfo &amp; refresh</div>
+                <p class="psdesc">
+                  Access token unlocks <code class="ic">/userinfo</code>.
+                  Refresh tokens rotate on use. JWKS at
+                  <code class="ic">/.well-known/jwks.json</code> for JWT
+                  verification.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="quote">
+      <div class="si">
+        <div class="rev">
+          <div class="qm" aria-hidden="true">"</div>
+          <p class="qt">
+            Auth should be <em>invisible</em> to your users and
+            <em>effortless</em> for your team.
+          </p>
+          <div class="qc">The Iris Principle</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="trust">
+      <div class="si">
+        <div class="tlab rev">Trusted by engineering teams</div>
+        <div class="tg rev d1x">
+          <span class="tlo">Acme Corp</span><span class="tlo">Vertex</span
+          ><span class="tlo">Novalab</span><span class="tlo">Stratum</span
+          ><span class="tlo">Quorum</span><span class="tlo">Meridian</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="cta">
+      <div class="cglow" aria-hidden="true"></div>
+      <div class="cgrid" aria-hidden="true"></div>
+      <div class="si">
+        <div class="rev">
+          <h2 class="ctitle">Ready to<br /><em>integrate?</em></h2>
+          <p class="csub">
+            Register your first application in minutes. No credit card required.
+          </p>
+          <div class="cbtns">
+            <a href="/auth/authenticate/signup" class="bcg"
+              >Create free account &#x2192;</a
+            >
+            <a href="#" class="bco">View documentation</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <div class="si">
+        <div class="fgd">
+          <div>
+            <div class="fbn">Iris</div>
+            <div class="fbs">Identity &amp; Access Platform</div>
+            <p class="fbd">
+              OAuth 2.0 &amp; OpenID Connect &#x2014; built for teams who
+              prioritise security, clarity, and developer trust.
+            </p>
+          </div>
+          <div class="fcol">
+            <h4>Product</h4>
+            <ul>
+              <li><a href="#">Features</a></li>
+              <li><a href="#">Pricing</a></li>
+              <li><a href="#">Changelog</a></li>
+              <li><a href="#">Roadmap</a></li>
+            </ul>
+          </div>
+          <div class="fcol">
+            <h4>Developers</h4>
+            <ul>
+              <li><a href="#">Documentation</a></li>
+              <li><a href="#">API Reference</a></li>
+              <li><a href="#">SDKs</a></li>
+              <li><a href="#">Status</a></li>
+            </ul>
+          </div>
+          <div class="fcol">
+            <h4>Company</h4>
+            <ul>
+              <li><a href="#">About</a></li>
+              <li><a href="#">Security</a></li>
+              <li><a href="#">Privacy</a></li>
+              <li><a href="#">Terms</a></li>
+            </ul>
+          </div>
+        </div>
+        <div class="fbot">
+          <span>&#xa9; 2025 Iris Identity Platform</span>
+          <div class="fbdgs">
+            <span class="fbdg">OAuth 2.0</span><span class="fbdg">OIDC 1.0</span
+            ><span class="fbdg">RFC 7636</span><span class="fbdg">SOC 2</span>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <script>
+      (function () {
+        var cur = document.getElementById("cur"),
+          ring = document.getElementById("cur-r");
+        var mx = window.innerWidth / 2,
+          my = window.innerHeight / 2,
+          rx = mx,
+          ry = my;
+        if (window.matchMedia("(hover:hover)").matches) {
+          document.addEventListener("mousemove", function (e) {
+            mx = e.clientX;
+            my = e.clientY;
+            cur.style.left = mx + "px";
+            cur.style.top = my + "px";
+          });
+          (function a() {
+            rx += (mx - rx) * 0.11;
+            ry += (my - ry) * 0.11;
+            ring.style.left = rx + "px";
+            ring.style.top = ry + "px";
+            requestAnimationFrame(a);
+          })();
+          document.querySelectorAll("a,button").forEach(function (el) {
+            el.addEventListener("mouseenter", function () {
+              ring.style.width = "50px";
+              ring.style.height = "50px";
+              ring.style.opacity = ".5";
+            });
+            el.addEventListener("mouseleave", function () {
+              ring.style.width = "34px";
+              ring.style.height = "34px";
+              ring.style.opacity = "1";
+            });
+          });
+        }
+        var nav = document.getElementById("nav");
+        window.addEventListener(
+          "scroll",
+          function () {
+            nav.classList.toggle("sc", window.scrollY > 50);
+          },
+          { passive: true },
+        );
+        var io = new IntersectionObserver(
+          function (e) {
+            e.forEach(function (x) {
+              if (x.isIntersecting) {
+                x.target.classList.add("in");
+                io.unobserve(x.target);
+              }
+            });
+          },
+          { threshold: 0.09 },
+        );
+        document.querySelectorAll(".rev").forEach(function (el) {
+          io.observe(el);
+        });
+        var hg = document.querySelector(".hglow");
+        window.addEventListener(
+          "scroll",
+          function () {
+            if (hg)
+              hg.style.transform =
+                "translateX(-50%) translateY(" + window.scrollY * 0.25 + "px)";
+          },
+          { passive: true },
+        );
+        document.querySelectorAll(".fc").forEach(function (c) {
+          c.addEventListener("mousemove", function (e) {
+            var r = c.getBoundingClientRect();
+            var dx = ((e.clientX - r.left) / r.width - 0.5) * 7,
+              dy = ((e.clientY - r.top) / r.height - 0.5) * 7;
+            c.style.transform =
+              "perspective(700px) rotateX(" +
+              -dy +
+              "deg) rotateY(" +
+              dx +
+              "deg) translateZ(3px)";
+            c.style.transition = "transform .08s";
+          });
+          c.addEventListener("mouseleave", function () {
+            c.style.transform =
+              "perspective(700px) rotateX(0) rotateY(0) translateZ(0)";
+            c.style.transition = "transform .55s cubic-bezier(.22,1,.36,1)";
+          });
+        });
+        var cls = document.querySelectorAll(".cl");
+        cls.forEach(function (l, i) {
+          l.style.opacity = "0";
+          l.style.transform = "translateX(-8px)";
+          l.style.transition =
+            "opacity .35s " +
+            (0.85 + i * 0.07) +
+            "s ease,transform .35s " +
+            (0.85 + i * 0.07) +
+            "s ease";
+        });
+        setTimeout(function () {
+          cls.forEach(function (l) {
+            l.style.opacity = "1";
+            l.style.transform = "translateX(0)";
+          });
+        }, 60);
+        var pd = document.querySelector(".pd"),
+          pdone = false;
+        if (pd) {
+          new IntersectionObserver(
+            function (e) {
+              if (e[0].isIntersecting && !pdone) {
+                pdone = true;
+                document.querySelectorAll(".fr").forEach(function (r, i) {
+                  r.style.opacity = "0";
+                  r.style.transform = "translateX(-10px)";
+                  setTimeout(function () {
+                    r.style.transition =
+                      "opacity .35s ease,transform .35s ease";
+                    r.style.opacity = "1";
+                    r.style.transform = "translateX(0)";
+                  }, i * 70);
+                });
+              }
+            },
+            { threshold: 0.2 },
+          ).observe(pd);
+        }
+        var sdone = false,
+          sel = document.querySelector(".stats");
+        if (sel) {
+          new IntersectionObserver(
+            function (e) {
+              if (e[0].isIntersecting && !sdone) {
+                sdone = true;
+                document.querySelectorAll(".snum span").forEach(function (el) {
+                  var t = el.textContent.trim();
+                  if (t === "&#x221E;" || t === "2") return;
+                  var tv = parseFloat(t);
+                  if (isNaN(tv)) return;
+                  var st = null,
+                    dur = 1200;
+                  (function step(ts) {
+                    if (!st) st = ts;
+                    var p = Math.min((ts - st) / dur, 1),
+                      ease = 1 - Math.pow(1 - p, 4),
+                      v = tv * ease;
+                    el.textContent =
+                      t.indexOf(".") > -1 ? v.toFixed(2) : Math.round(v);
+                    if (p < 1) requestAnimationFrame(step);
+                    else el.textContent = t;
+                  })(performance.now());
+                });
+              }
+            },
+            { threshold: 0.3 },
+          ).observe(sel);
+        }
+      })();
+    </script>
+  </body>
+</html>

@@ -2,6 +2,7 @@ import express from "express";
 import ApiResponse from "./common/utils/api-response.js";
 import authRouter from "./modules/auth/auth.routes.js";
 import adminRouter from "./modules/admin/admin.routes.js";
+import { join } from "node:path";
 
 export function createApplication() {
   const app = express();
@@ -11,8 +12,10 @@ export function createApplication() {
   app.use("/auth", authRouter);
   app.use("/admin", adminRouter);
 
+  const PUBLIC_DIR = join(process.cwd(), "public");
+
   app.get("/", (_, res) => {
-    ApiResponse.ok(res, "Welcome to Iris.");
+    res.sendFile(join(PUBLIC_DIR, "index.html"))
   });
 
   app.get("/.well-known/openid-configuration", (_, res) => {

@@ -4,20 +4,13 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Register Application — Iris</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Instrument+Sans:wght@400;500;600&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Syne:wght@400;500;600;700;800&family=JetBrains+Mono:wght@300;400;500&display=swap"
       rel="stylesheet"
     />
     <style>
-      :root {
-        --bg: #0a0a0a;
-        --surface: rgba(255, 255, 255, 0.04);
-        --border: rgba(255, 255, 255, 0.09);
-        --borderhi: rgba(255, 255, 255, 0.22);
-        --text: #f0f0f0;
-        --muted: #777;
-        --input-bg: rgba(255, 255, 255, 0.03);
-      }
       *,
       *::before,
       *::after {
@@ -25,56 +18,129 @@
         margin: 0;
         padding: 0;
       }
+
+      :root {
+        --gold: #e4cc37;
+        --gold-dim: rgba(228, 204, 55, 0.18);
+        --gold-glow: rgba(228, 204, 55, 0.07);
+        --gold-border: rgba(228, 204, 55, 0.22);
+        --ink: #080808;
+        --ink3: #161616;
+        --border: rgba(255, 255, 255, 0.07);
+        --border-hi: rgba(255, 255, 255, 0.18);
+        --text: #f2f2f0;
+        --muted: #555550;
+        --muted2: #888880;
+        --serif: "Cormorant Garamond", Georgia, serif;
+        --sans: "Syne", system-ui, sans-serif;
+        --mono: "JetBrains Mono", monospace;
+        --input-bg: rgba(255, 255, 255, 0.03);
+      }
+
+      html {
+        -webkit-text-size-adjust: 100%;
+      }
       body {
-        min-height: 100vh;
-        font-family: "Instrument Sans", sans-serif;
-        background: var(--bg);
+        min-height: 100svh;
+        font-family: var(--sans);
+        background: var(--ink);
         color: var(--text);
         display: flex;
-        align-items: center;
+        align-items: flex-start;
         justify-content: center;
-        padding: 3rem 1.5rem;
+        padding: 4rem 1.5rem 6rem;
         position: relative;
         overflow-x: hidden;
       }
-      body::before {
-        content: "";
-        position: fixed;
-        inset: 0;
-        z-index: 0;
-        background:
-          radial-gradient(
-            ellipse 70% 55% at 15% 8%,
-            rgba(255, 255, 255, 0.028) 0%,
-            transparent 60%
-          ),
-          radial-gradient(
-            ellipse 55% 45% at 85% 92%,
-            rgba(255, 255, 255, 0.022) 0%,
-            transparent 55%
-          );
-        pointer-events: none;
+      @media (hover: hover) {
+        body {
+          cursor: none;
+        }
       }
-      body::after {
-        content: "";
+      ::selection {
+        background: var(--gold);
+        color: var(--ink);
+      }
+
+      /* ─ Cursor ─ */
+      #cur,
+      #cur-r {
+        position: fixed;
+        z-index: 9999;
+        pointer-events: none;
+        border-radius: 50%;
+        transform: translate(-50%, -50%);
+      }
+      #cur {
+        width: 9px;
+        height: 9px;
+        background: var(--gold);
+        mix-blend-mode: difference;
+        transition:
+          width 0.25s,
+          height 0.25s;
+      }
+      #cur-r {
+        width: 34px;
+        height: 34px;
+        border: 1px solid rgba(228, 204, 55, 0.45);
+        transition:
+          width 0.3s,
+          height 0.3s,
+          opacity 0.3s;
+      }
+      @media (hover: none) {
+        #cur,
+        #cur-r {
+          display: none;
+        }
+      }
+
+      /* ─ Background ─ */
+      .noise {
         position: fixed;
         inset: 0;
         z-index: 0;
+        pointer-events: none;
+        opacity: 0.026;
+        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      }
+      .gridbg {
+        position: fixed;
+        inset: 0;
+        z-index: 0;
+        pointer-events: none;
         background-image:
-          linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px),
+          linear-gradient(rgba(255, 255, 255, 0.022) 1px, transparent 1px),
           linear-gradient(
             90deg,
-            rgba(255, 255, 255, 0.025) 1px,
+            rgba(255, 255, 255, 0.022) 1px,
             transparent 1px
           );
-        background-size: 80px 80px;
-        pointer-events: none;
+        background-size: 62px 62px;
       }
+      .bgGlow {
+        position: fixed;
+        z-index: 0;
+        pointer-events: none;
+        top: -10%;
+        left: 50%;
+        transform: translateX(-50%);
+        width: min(700px, 100vw);
+        height: 450px;
+        background: radial-gradient(
+          ellipse at 50% 0%,
+          rgba(228, 204, 55, 0.045) 0%,
+          transparent 65%
+        );
+      }
+
+      /* ─ Wrap ─ */
       .wrap {
         position: relative;
         z-index: 1;
         width: 100%;
-        max-width: 510px;
+        max-width: 560px;
         animation: rise 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
       }
       @keyframes rise {
@@ -87,67 +153,129 @@
           transform: translateY(0);
         }
       }
+
+      /* ─ Wordmark ─ */
       .wordmark {
         text-align: center;
-        margin-bottom: 2.4rem;
+        margin-bottom: 2.6rem;
       }
-      .wordmark h1 {
-        font-family: "Cormorant Garamond", serif;
+      .wordmark a {
+        font-family: var(--serif);
         font-weight: 300;
         font-size: 2.1rem;
-        letter-spacing: 0.3em;
+        letter-spacing: 0.35em;
         text-transform: uppercase;
         color: #fff;
+        text-decoration: none;
+        position: relative;
+        display: inline-block;
+      }
+      .wordmark a::after {
+        content: "·";
+        color: var(--gold);
+        position: absolute;
+        right: -0.3em;
+        bottom: 0.1em;
+        font-size: 0.42em;
       }
       .wordmark p {
-        margin-top: 0.25rem;
-        font-size: 0.64rem;
+        margin-top: 0.3rem;
+        font-size: 0.62rem;
         letter-spacing: 0.22em;
         text-transform: uppercase;
         color: var(--muted);
+        font-weight: 500;
       }
+
+      /* ─ Card ─ */
       .card {
-        background: var(--surface);
+        background: rgba(255, 255, 255, 0.028);
         backdrop-filter: blur(28px) saturate(150%);
         -webkit-backdrop-filter: blur(28px) saturate(150%);
         border: 1px solid var(--border);
         border-radius: 2px;
-        padding: 2.8rem 2.6rem;
+        padding: 2.8rem 2.8rem;
         box-shadow:
-          0 0 0 1px rgba(255, 255, 255, 0.025) inset,
-          0 48px 96px rgba(0, 0, 0, 0.65);
+          0 0 0 1px rgba(255, 255, 255, 0.02) inset,
+          0 48px 96px rgba(0, 0, 0, 0.7);
       }
+
+      /* ─ Card head ─ */
       .card-head {
         padding-bottom: 2rem;
-        margin-bottom: 2rem;
+        margin-bottom: 2.2rem;
         border-bottom: 1px solid var(--border);
+        display: flex;
+        align-items: flex-start;
+        gap: 1.2rem;
+      }
+      .card-head-icon {
+        width: 48px;
+        height: 48px;
+        flex-shrink: 0;
+        border: 1px solid var(--gold-border);
+        border-radius: 2px;
+        background: var(--gold-glow);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-top: 0.2rem;
+      }
+      .card-head-icon svg {
+        width: 22px;
+        height: 22px;
+      }
+      .card-head-text {
+        flex: 1;
       }
       .eyebrow {
-        font-size: 0.63rem;
+        font-size: 0.62rem;
         letter-spacing: 0.2em;
         text-transform: uppercase;
-        color: var(--muted);
-        margin-bottom: 0.65rem;
-        font-weight: 500;
+        color: var(--gold);
+        margin-bottom: 0.6rem;
+        font-weight: 600;
+        opacity: 0.8;
       }
       .card-head h2 {
-        font-family: "Cormorant Garamond", serif;
+        font-family: var(--serif);
         font-weight: 400;
-        font-size: 1.85rem;
-        letter-spacing: -0.01em;
-        line-height: 1.15;
+        font-size: 1.9rem;
+        line-height: 1.1;
         color: #fff;
+        letter-spacing: -0.01em;
       }
       .card-head h2 em {
         font-style: italic;
         font-weight: 300;
+        color: rgba(255, 255, 255, 0.45);
       }
       .card-head p {
-        margin-top: 0.55rem;
-        font-size: 0.8rem;
-        color: var(--muted);
+        margin-top: 0.5rem;
+        font-size: 0.82rem;
+        color: var(--muted2);
         line-height: 1.65;
+        font-weight: 400;
       }
+
+      /* ─ Error banner ─ */
+      .error-banner {
+        display: none;
+        background: rgba(255, 80, 80, 0.07);
+        border: 1px solid rgba(255, 80, 80, 0.22);
+        border-left: 3px solid rgba(255, 80, 80, 0.6);
+        border-radius: 2px;
+        padding: 0.72rem 0.9rem;
+        margin-bottom: 1.2rem;
+        font-size: 0.78rem;
+        color: rgba(255, 130, 130, 0.9);
+        animation: rise 0.25s cubic-bezier(0.22, 1, 0.36, 1) both;
+      }
+      .error-banner.visible {
+        display: block;
+      }
+
+      /* ─ Fields ─ */
       .field {
         margin-bottom: 1.45rem;
       }
@@ -155,14 +283,14 @@
         display: flex;
         justify-content: space-between;
         align-items: baseline;
-        margin-bottom: 0.42rem;
+        margin-bottom: 0.45rem;
       }
       .field-top label {
-        font-size: 0.68rem;
+        font-size: 0.65rem;
         letter-spacing: 0.14em;
         text-transform: uppercase;
-        color: var(--muted);
-        font-weight: 500;
+        color: var(--muted2);
+        font-weight: 600;
       }
       .field-top .opt {
         font-size: 0.63rem;
@@ -170,17 +298,16 @@
         letter-spacing: 0.08em;
         text-transform: uppercase;
       }
+
       input[type="text"],
-      input[type="url"],
-      select,
-      textarea {
+      input[type="url"] {
         width: 100%;
         background: var(--input-bg);
         border: 1px solid var(--border);
         border-radius: 2px;
-        padding: 0.72rem 0.9rem;
+        padding: 0.75rem 1rem;
         color: var(--text);
-        font-family: "Instrument Sans", sans-serif;
+        font-family: var(--sans);
         font-size: 0.86rem;
         font-weight: 400;
         outline: none;
@@ -190,50 +317,52 @@
           box-shadow 0.18s;
         -webkit-appearance: none;
       }
-      input::placeholder,
-      textarea::placeholder {
-        color: rgba(255, 255, 255, 0.16);
+      input::placeholder {
+        color: rgba(255, 255, 255, 0.14);
       }
-      input:focus,
-      select:focus,
-      textarea:focus {
-        border-color: var(--borderhi);
-        background: rgba(255, 255, 255, 0.05);
-        box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.04);
+      input:focus {
+        border-color: var(--gold-border);
+        background: rgba(228, 204, 55, 0.03);
+        box-shadow: 0 0 0 3px rgba(228, 204, 55, 0.07);
       }
-      textarea {
-        resize: vertical;
-        min-height: 86px;
-        line-height: 1.6;
-        font-size: 0.83rem;
-      }
-      select option {
-        background: #161616;
-      }
+
       .hint {
-        margin-top: 0.38rem;
+        margin-top: 0.4rem;
         font-size: 0.7rem;
         color: rgba(255, 255, 255, 0.22);
         line-height: 1.5;
+        font-weight: 400;
       }
-      .rule {
-        border: none;
-        border-top: 1px solid var(--border);
-        margin: 1.8rem 0;
+
+      /* ─ Section divider ─ */
+      .section-divider {
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+        margin: 2rem 0 1.6rem;
       }
-      .scope-row-label {
-        font-size: 0.68rem;
+      .section-divider::before,
+      .section-divider::after {
+        content: "";
+        flex: 1;
+        height: 1px;
+        background: var(--border);
+      }
+      .section-divider span {
+        font-size: 0.62rem;
         letter-spacing: 0.14em;
         text-transform: uppercase;
         color: var(--muted);
-        font-weight: 500;
-        margin-bottom: 0.55rem;
+        font-weight: 600;
+        white-space: nowrap;
       }
+
+      /* ─ Scope grid ─ */
       .scopes {
         display: grid;
         grid-template-columns: repeat(3, 1fr);
-        gap: 0.45rem;
-        margin-bottom: 1.45rem;
+        gap: 0.5rem;
+        margin-bottom: 1.6rem;
       }
       .scope-item {
         display: flex;
@@ -241,276 +370,289 @@
         gap: 0.45rem;
         border: 1px solid var(--border);
         border-radius: 2px;
-        padding: 0.52rem 0.65rem;
+        padding: 0.55rem 0.7rem;
         cursor: pointer;
         transition:
           border-color 0.15s,
           background 0.15s,
           color 0.15s;
-        font-size: 0.76rem;
-        color: var(--muted);
+        font-size: 0.74rem;
+        color: var(--muted2);
         user-select: none;
+        font-weight: 500;
       }
       .scope-item:hover {
-        border-color: rgba(255, 255, 255, 0.2);
+        border-color: rgba(255, 255, 255, 0.18);
         color: var(--text);
       }
       .scope-item.on {
-        border-color: rgba(255, 255, 255, 0.3);
-        background: rgba(255, 255, 255, 0.055);
-        color: var(--text);
+        border-color: var(--gold-border);
+        background: var(--gold-glow);
+        color: var(--gold);
+      }
+      .scope-box {
+        width: 14px;
+        height: 14px;
+        border: 1px solid var(--border);
+        border-radius: 1px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.6rem;
+        flex-shrink: 0;
+        transition: all 0.15s;
+      }
+      .scope-item.on .scope-box {
+        background: var(--gold);
+        border-color: var(--gold);
+        color: var(--ink);
       }
       .scope-item input {
         display: none;
       }
-      .scope-box {
-        width: 12px;
-        height: 12px;
-        border: 1px solid currentColor;
-        border-radius: 1px;
-        flex-shrink: 0;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 0.52rem;
-        opacity: 0.45;
-        transition: opacity 0.15s;
-      }
-      .scope-item.on .scope-box {
-        opacity: 1;
-      }
-      .select-wrap {
-        position: relative;
-      }
-      .select-wrap::after {
-        content: "";
-        position: absolute;
-        right: 0.9rem;
-        top: 50%;
-        transform: translateY(-50%);
-        width: 0;
-        height: 0;
-        border-left: 4px solid transparent;
-        border-right: 4px solid transparent;
-        border-top: 4px solid var(--muted);
-        pointer-events: none;
-      }
+
+      /* ─ Button ─ */
       .btn {
         width: 100%;
-        padding: 0.88rem;
-        background: #fff;
-        border: none;
+        padding: 0.92rem 1.5rem;
+        background: var(--gold);
+        border: 1px solid var(--gold);
         border-radius: 2px;
-        color: #0a0a0a;
-        font-family: "Instrument Sans", sans-serif;
-        font-weight: 600;
-        font-size: 0.78rem;
-        letter-spacing: 0.13em;
+        color: var(--ink);
+        font-family: var(--sans);
+        font-size: 0.72rem;
+        font-weight: 700;
+        letter-spacing: 0.14em;
         text-transform: uppercase;
         cursor: pointer;
-        margin-top: 0.4rem;
         transition:
           background 0.18s,
-          transform 0.12s,
-          box-shadow 0.18s;
+          box-shadow 0.18s,
+          transform 0.12s;
       }
       .btn:hover {
-        background: #e6e6e6;
+        background: #f0d83e;
+        box-shadow: 0 0 32px rgba(228, 204, 55, 0.32);
         transform: translateY(-1px);
-        box-shadow: 0 10px 28px rgba(0, 0, 0, 0.45);
       }
       .btn:active {
         transform: translateY(0);
       }
+
+      /* ─ Foot ─ */
       .foot {
         margin-top: 1.5rem;
         text-align: center;
         font-size: 0.72rem;
-        color: rgba(255, 255, 255, 0.2);
-        line-height: 1.65;
+        color: var(--muted);
+        letter-spacing: 0.03em;
+        line-height: 1.7;
       }
       .foot a {
-        color: rgba(255, 255, 255, 0.38);
+        color: var(--muted2);
         text-decoration: none;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.12);
-        transition: color 0.15s;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        transition:
+          color 0.15s,
+          border-color 0.15s;
       }
       .foot a:hover {
-        color: rgba(255, 255, 255, 0.7);
+        color: var(--gold);
+        border-color: var(--gold-border);
       }
 
-      .error-banner {
-        display: none;
-        background: rgba(255, 80, 80, 0.08);
-        border: 1px solid rgba(255, 80, 80, 0.25);
-        border-radius: 2px;
-        padding: 0.7rem 0.9rem;
-        margin-bottom: 1.2rem;
-        font-size: 0.78rem;
-        color: rgba(255, 120, 120, 0.9);
-        letter-spacing: 0.03em;
-        animation: rise 0.25s cubic-bezier(0.22, 1, 0.36, 1) both;
-      }
-      .error-banner.visible {
-        display: block;
-      }
-
-      /* success modal */
+      /* ─ Credentials modal ─ */
       .modal-overlay {
-        display: none;
         position: fixed;
         inset: 0;
-        background: rgba(0, 0, 0, 0.75);
-        z-index: 100;
+        z-index: 200;
+        background: rgba(0, 0, 0, 0.82);
+        backdrop-filter: blur(8px);
+        display: none;
         align-items: center;
         justify-content: center;
-        padding: 1.5rem;
+        padding: 2rem 1.5rem;
       }
       .modal-overlay.visible {
         display: flex;
       }
+
       .modal {
-        background: #111;
-        border: 1px solid var(--border);
+        background: #0e0e0e;
+        border: 1px solid var(--gold-border);
         border-radius: 2px;
-        padding: 2rem;
+        padding: 2.4rem 2.4rem;
         width: 100%;
-        max-width: 460px;
-        box-shadow: 0 48px 96px rgba(0, 0, 0, 0.8);
-        animation: rise 0.3s cubic-bezier(0.22, 1, 0.36, 1) both;
+        max-width: 480px;
+        box-shadow:
+          0 0 60px rgba(228, 204, 55, 0.1),
+          0 48px 96px rgba(0, 0, 0, 0.8);
+        animation: rise 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+        position: relative;
       }
+      .modal::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 3px;
+        background: linear-gradient(90deg, var(--gold), transparent);
+        opacity: 0.7;
+      }
+
       .modal-eyebrow {
-        font-size: 0.63rem;
+        font-size: 0.62rem;
         letter-spacing: 0.2em;
         text-transform: uppercase;
-        color: rgba(100, 200, 120, 0.7);
-        margin-bottom: 0.5rem;
-        font-weight: 500;
+        color: var(--gold);
+        margin-bottom: 0.6rem;
+        font-weight: 600;
+        opacity: 0.8;
       }
       .modal h3 {
-        font-family: "Cormorant Garamond", serif;
+        font-family: var(--serif);
         font-weight: 400;
-        font-size: 1.5rem;
+        font-size: 1.6rem;
         color: #fff;
-        margin-bottom: 0.4rem;
+        margin-bottom: 0.6rem;
       }
+
       .modal-warn {
-        font-size: 0.75rem;
-        color: rgba(255, 180, 80, 0.8);
-        margin-bottom: 1.4rem;
-        line-height: 1.55;
-        border: 1px solid rgba(255, 180, 80, 0.2);
+        font-size: 0.78rem;
+        color: rgba(255, 200, 80, 0.8);
+        background: rgba(255, 200, 80, 0.07);
+        border: 1px solid rgba(255, 200, 80, 0.2);
         border-radius: 2px;
-        padding: 0.55rem 0.75rem;
-        background: rgba(255, 180, 80, 0.05);
+        padding: 0.65rem 0.9rem;
+        margin-bottom: 1.6rem;
+        font-weight: 500;
       }
+
       .cred-field {
-        margin-bottom: 1rem;
+        margin-bottom: 1.1rem;
       }
       .cred-label {
-        font-size: 0.63rem;
-        letter-spacing: 0.16em;
+        font-size: 0.62rem;
+        letter-spacing: 0.14em;
         text-transform: uppercase;
         color: var(--muted);
-        margin-bottom: 0.35rem;
+        font-weight: 600;
+        margin-bottom: 0.45rem;
       }
       .cred-value {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
         background: var(--input-bg);
         border: 1px solid var(--border);
         border-radius: 2px;
-        padding: 0.65rem 0.85rem;
-        font-size: 0.78rem;
-        color: var(--text);
-        font-family: monospace;
-        word-break: break-all;
+        padding: 0.75rem 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
         cursor: pointer;
-        transition: border-color 0.15s;
+        transition:
+          border-color 0.15s,
+          background 0.15s;
       }
       .cred-value:hover {
-        border-color: var(--borderhi);
+        border-color: var(--gold-border);
+        background: var(--gold-glow);
+      }
+      .cred-value span:first-child {
+        font-family: var(--mono);
+        font-size: 0.76rem;
+        color: var(--text);
+        word-break: break-all;
+        font-weight: 400;
       }
       .copy-hint {
-        font-size: 0.65rem;
+        font-size: 0.62rem;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
         color: var(--muted);
-        margin-left: auto;
+        white-space: nowrap;
+        font-weight: 600;
         flex-shrink: 0;
-        font-family: "Instrument Sans", sans-serif;
+      }
+      .cred-value:hover .copy-hint {
+        color: var(--gold);
       }
 
-      /* ── Responsive ── */
+      /* ─ Responsive ─ */
       @media (max-width: 600px) {
-        body {
-          padding: 1.5rem 1rem;
-          align-items: flex-start;
-        }
         .wrap {
           max-width: 100%;
         }
-        .wordmark {
-          margin-bottom: 1.6rem;
-        }
-        .wordmark h1 {
-          font-size: 1.6rem;
-        }
         .card {
           padding: 1.6rem 1.2rem;
-        }
-        .card-head {
-          padding-bottom: 1.4rem;
-          margin-bottom: 1.4rem;
-        }
-        .card-head h2 {
-          font-size: 1.55rem;
         }
         .scopes {
           grid-template-columns: repeat(2, 1fr);
         }
         .modal {
-          padding: 1.4rem 1.1rem;
+          padding: 1.6rem 1.2rem;
         }
         .cred-value {
           flex-direction: column;
           align-items: flex-start;
           gap: 0.3rem;
         }
-        .copy-hint {
-          margin-left: 0;
-        }
       }
-
       @media (max-width: 380px) {
         .card {
           padding: 1.2rem 0.9rem;
         }
-        .scopes {
-          grid-template-columns: 1fr 1fr;
-        }
-        .field-top {
+        .card-head {
           flex-direction: column;
-          gap: 0.15rem;
+          gap: 0.8rem;
+        }
+        .wordmark a {
+          font-size: 1.6rem;
         }
       }
     </style>
   </head>
   <body>
+    <div id="cur"></div>
+    <div id="cur-r"></div>
+    <div class="noise" aria-hidden="true"></div>
+    <div class="gridbg" aria-hidden="true"></div>
+    <div class="bgGlow" aria-hidden="true"></div>
+
     <div class="wrap">
       <div class="wordmark">
-        <h1>Iris</h1>
+        <a href="/">Iris</a>
         <p>Identity &amp; Access Platform</p>
       </div>
+
       <div class="card">
         <div class="card-head">
-          <div class="eyebrow">Developer Console</div>
-          <h2>Register <em>Application</em></h2>
-          <p>
-            Create an OAuth 2.0 / OIDC client. A client ID and secret will be
-            issued upon registration.
-          </p>
+          <div class="card-head-icon" aria-hidden="true">
+            <!-- Terminal / app icon -->
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="rgba(228,204,55,.65)"
+              stroke-width="1.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <rect x="3" y="4" width="18" height="16" rx="2" />
+              <path d="M7 9l2 2-2 2M11 13h4" />
+            </svg>
+          </div>
+          <div class="card-head-text">
+            <div class="eyebrow">Developer Console</div>
+            <h2>Register <em>Application</em></h2>
+            <p>
+              Create an OAuth 2.0 / OIDC client. A client ID and secret will be
+              issued upon registration.
+            </p>
+          </div>
         </div>
+
         <div class="error-banner" id="errorBanner"></div>
+
         <form onsubmit="handleSubmit(event)">
           <div class="field">
             <div class="field-top">
@@ -523,6 +665,7 @@
               required
             />
           </div>
+
           <div class="field">
             <div class="field-top">
               <label for="appUrl">Application URL</label>
@@ -537,6 +680,7 @@
               Must be HTTPS in all production environments.
             </div>
           </div>
+
           <div class="field">
             <div class="field-top">
               <label for="redirectUrl">Redirect URI</label>
@@ -548,74 +692,56 @@
               required
             />
             <div class="hint">
-              Authorization codes are delivered to this URI. Value must match
-              exactly at runtime.
+              Authorization codes are delivered to this URI. Must match exactly
+              at runtime.
             </div>
           </div>
-          <div class="field">
-            <!-- <div class="field-top">
-              <label for="desc">Description</label>
-              <span class="opt">Optional</span>
-            </div> -->
-            <!-- <textarea
-              id="desc"
-              placeholder="Describe your application and how it uses the requested scopes."
-            ></textarea> -->
+
+          <div class="section-divider">
+            <span>Requested Scopes</span>
           </div>
-          <hr class="rule" />
-          <!-- <div class="scope-row-label">Requested Scopes</div>
+
           <div class="scopes">
-            <label class="scope-item on" onclick="toggleScope(this)"
-              ><input type="checkbox" checked /><span class="scope-box"
-                >&#10003;</span
-              >openid</label
-            >
-            <label class="scope-item on" onclick="toggleScope(this)"
-              ><input type="checkbox" checked /><span class="scope-box"
-                >&#10003;</span
-              >profile</label
-            >
-            <label class="scope-item" onclick="toggleScope(this)"
-              ><input type="checkbox" /><span class="scope-box"></span
-              >email</label
-            >
-            <label class="scope-item" onclick="toggleScope(this)"
-              ><input type="checkbox" /><span class="scope-box"></span
-              >offline_access</label
-            >
-            <label class="scope-item" onclick="toggleScope(this)"
-              ><input type="checkbox" /><span class="scope-box"></span
-              >phone</label
-            >
-            <label class="scope-item" onclick="toggleScope(this)"
-              ><input type="checkbox" /><span class="scope-box"></span
-              >address</label
-            >
-          </div> -->
-          <div class="field">
-            <!-- <div class="field-top">
-              <label for="grantType">Grant Type</label>
-            </div>
-            <div class="select-wrap">
-              <select id="grantType">
-                <option>Authorization Code (PKCE)</option>
-                <option>Client Credentials</option>
-                <option>Device Authorization</option>
-                <option>Implicit (Legacy)</option>
-              </select>
-            </div> -->
+            <label class="scope-item on" onclick="toggleScope(this)">
+              <input type="checkbox" checked />
+              <span class="scope-box">✓</span>openid
+            </label>
+            <label class="scope-item on" onclick="toggleScope(this)">
+              <input type="checkbox" checked />
+              <span class="scope-box">✓</span>profile
+            </label>
+            <label class="scope-item on" onclick="toggleScope(this)">
+              <input type="checkbox" checked />
+              <span class="scope-box">✓</span>email
+            </label>
+            <label class="scope-item" onclick="toggleScope(this)">
+              <input type="checkbox" />
+              <span class="scope-box"></span>offline_access
+            </label>
+            <label class="scope-item" onclick="toggleScope(this)">
+              <input type="checkbox" />
+              <span class="scope-box"></span>phone
+            </label>
+            <label class="scope-item" onclick="toggleScope(this)">
+              <input type="checkbox" />
+              <span class="scope-box"></span>address
+            </label>
           </div>
+
           <button type="submit" class="btn" id="submitBtn">
             Register Application
           </button>
         </form>
+
         <div class="foot">
-          By registering you agree to the <a href="#">Developer Terms</a> and
+          By registering you agree to the
+          <a href="#">Developer Terms</a> and
           <a href="#">Acceptable Use Policy</a>.
         </div>
       </div>
     </div>
 
+    <!-- Credentials modal -->
     <div class="modal-overlay" id="modalOverlay">
       <div class="modal">
         <div class="modal-eyebrow">Registration Successful</div>
@@ -627,13 +753,15 @@
         <div class="cred-field">
           <div class="cred-label">Client ID</div>
           <div class="cred-value" onclick="copyText(this)" id="outClientId">
-            <span></span><span class="copy-hint">click to copy</span>
+            <span></span>
+            <span class="copy-hint">Click to copy</span>
           </div>
         </div>
         <div class="cred-field">
           <div class="cred-label">Client Secret</div>
           <div class="cred-value" onclick="copyText(this)" id="outClientSecret">
-            <span></span><span class="copy-hint">click to copy</span>
+            <span></span>
+            <span class="copy-hint">Click to copy</span>
           </div>
         </div>
         <button
@@ -641,23 +769,67 @@
           onclick="
             document.getElementById('modalOverlay').classList.remove('visible')
           "
-          style="margin-top: 1rem"
+          style="margin-top: 1.2rem"
         >
           Done
         </button>
       </div>
     </div>
+
     <script>
-      function showError(msg) {
-        const banner = document.getElementById("errorBanner");
-        banner.textContent = msg;
-        banner.classList.add("visible");
+      // Cursor
+      var cur = document.getElementById("cur"),
+        ring = document.getElementById("cur-r");
+      var mx = window.innerWidth / 2,
+        my = window.innerHeight / 2,
+        rx = mx,
+        ry = my;
+      if (window.matchMedia("(hover:hover)").matches) {
+        document.addEventListener("mousemove", function (e) {
+          mx = e.clientX;
+          my = e.clientY;
+          cur.style.left = mx + "px";
+          cur.style.top = my + "px";
+        });
+        (function a() {
+          rx += (mx - rx) * 0.11;
+          ry += (my - ry) * 0.11;
+          ring.style.left = rx + "px";
+          ring.style.top = ry + "px";
+          requestAnimationFrame(a);
+        })();
+        document.querySelectorAll("a,button").forEach(function (el) {
+          el.addEventListener("mouseenter", function () {
+            ring.style.width = "50px";
+            ring.style.height = "50px";
+            ring.style.opacity = ".5";
+          });
+          el.addEventListener("mouseleave", function () {
+            ring.style.width = "34px";
+            ring.style.height = "34px";
+            ring.style.opacity = "1";
+          });
+        });
       }
 
+      function showError(msg) {
+        const b = document.getElementById("errorBanner");
+        b.textContent = msg;
+        b.classList.add("visible");
+      }
       function clearError() {
-        const banner = document.getElementById("errorBanner");
-        banner.textContent = "";
-        banner.classList.remove("visible");
+        const b = document.getElementById("errorBanner");
+        b.textContent = "";
+        b.classList.remove("visible");
+      }
+
+      function toggleScope(el) {
+        const cb = el.querySelector("input");
+        const box = el.querySelector(".scope-box");
+        const now = !cb.checked;
+        cb.checked = now;
+        el.classList.toggle("on", now);
+        box.textContent = now ? "✓" : "";
       }
 
       function showCredentials(clientId, clientSecret) {
@@ -674,19 +846,19 @@
         const text = el.querySelector("span").textContent;
         navigator.clipboard.writeText(text);
         const hint = el.querySelector(".copy-hint");
-        hint.textContent = "copied!";
-        setTimeout(() => (hint.textContent = "click to copy"), 2000);
+        hint.textContent = "Copied!";
+        setTimeout(() => {
+          hint.textContent = "Click to copy";
+        }, 2000);
       }
 
       async function handleSubmit(e) {
         e.preventDefault();
         clearError();
-
         const btn = document.getElementById("submitBtn");
-        btn.textContent = "Registering...";
-        btn.style.opacity = "0.55";
+        btn.textContent = "Registering…";
+        btn.style.opacity = ".55";
         btn.disabled = true;
-
         try {
           const res = await fetch("/admin/register-client", {
             method: "POST",
@@ -697,10 +869,8 @@
               redirectUri: document.getElementById("redirectUrl").value,
             }),
           });
-
-          const body = await res.json(); // ← called as function
+          const body = await res.json();
           if (!res.ok) throw new Error(body.error || "Registration failed");
-
           showCredentials(body.data.clientId, body.data.clientSecret);
         } catch (error) {
           showError(error.message);
