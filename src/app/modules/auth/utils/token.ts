@@ -33,6 +33,18 @@ export function createEmailVerificationToken(payload: { id: string }) {
   });
 }
 
+export function createResetPasswordToken(payload: { id: string }) {
+  return JWT.sign(payload, process.env.JWT_RESET_PASSWORD_SECRET!, {
+    expiresIn: "15m",
+  });
+}
+
+export function verifyResetPasswordToken(token: string) {
+  return JWT.verify(token, process.env.JWT_RESET_PASSWORD_SECRET!) as {
+    id: string;
+  };
+}
+
 export function verifyEmailVerificationToken(token: string) {
   return JWT.verify(token, process.env.JWT_EMAIL_VERIFICATION_SECRET!) as {
     id: string;

@@ -39,8 +39,18 @@ export const emailVerificationModel = z.object({
   email: z.email(),
 });
 
+export const forgotPasswordPayloadModel = z.object({
+  email: z.email(),
+});
+
+export const resetPasswordPayloadModel = z.object({
+  token: z.string(),
+  newPassword: z.string(),
+});
+
 export type UserTokenPayload = z.infer<typeof userTokenPayloadModel>;
 export type UserSigninPayload = z.infer<typeof userSigninPayloadModel>;
 export type TokenRequestPayload = z.infer<typeof tokenRequestModel>;
 export type UserSignupPayload = z.infer<typeof userSignupPayloadModel>;
 export type RefreshTokenPayload = z.infer<typeof refreshTokenModel>;
+export type ResetPasswordPayload = z.infer<typeof resetPasswordPayloadModel>;

@@ -3,7 +3,9 @@ import AuthController from "./auth.controller.js";
 import validate from "../../common/middlewares/validate.middlware.js";
 import {
   emailVerificationModel,
+  forgotPasswordPayloadModel,
   refreshTokenModel,
+  resetPasswordPayloadModel,
   tokenRequestModel,
   userSigninPayloadModel,
   userSignupPayloadModel,
@@ -69,5 +71,18 @@ authRouter.post(
 );
 
 authRouter.get("/verify-email", AuthController.handleVerifyEmail);
+
+authRouter.post(
+  "/forgot-password",
+  validate(forgotPasswordPayloadModel),
+  AuthController.handleForgotPassword,
+);
+
+authRouter.get("/reset-password");
+authRouter.post(
+  "/reset-password",
+  validate(resetPasswordPayloadModel),
+  AuthController.handleResetPassword,
+);
 
 export default authRouter;

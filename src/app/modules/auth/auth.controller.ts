@@ -2,19 +2,24 @@ import type { Request, Response } from "express";
 import ApiResponse from "../../common/utils/api-response.js";
 import {
   clientExists,
+  forgotPassword,
   getClientMetadata,
   getJwks,
   getTokens,
   logout,
   refreshTokens,
   resendVerificationEmail,
+  resetPassword,
   signin,
   signup,
   verifyEmail,
 } from "./auth.services.js";
 import { join } from "node:path";
 import type { AuthenticatedRequest } from "../../common/utils/interfaces.js";
-import type { RefreshTokenPayload } from "./auth.models.js";
+import type {
+  RefreshTokenPayload,
+  ResetPasswordPayload,
+} from "./auth.models.js";
 
 class AuthController {
   private static PUBLIC_DIR = join(process.cwd(), "public");
@@ -164,6 +169,27 @@ class AuthController {
       await verifyEmail(token as string);
 
       ApiResponse.ok(res, "Email verified successfully");
+    } catch (error) {
+      ApiResponse.error(res, error);
+    }
+  }
+
+  static async handleForgotPassword(req: Request, res: Response) {
+    try {
+      const { email } = req.body;
+      await forgotPassword(email);
+
+      ApiResponse.ok(res, "Reset password link sent");
+    } catch (error) {
+      ApiResponse.error(res, error);
+    }
+  }
+
+  static async handleResetPassword(req: Request, res: Response) {
+    try {
+      const { token, newPassword } = req.query as ResetPasswordPayload;
+      await resetPassword(token, newPassword);
+      ApiResponse.ok(res, "Password updated successfully");
     } catch (error) {
       ApiResponse.error(res, error);
     }

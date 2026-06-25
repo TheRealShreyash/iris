@@ -17,7 +17,9 @@ import {
   createAccessToken,
   createEmailVerificationToken,
   createRefreshToken,
+  createResetPasswordToken,
   verifyEmailVerificationToken,
+  verifyResetPasswordToken,
 } from "./utils/token.js";
 import { PUBLIC_KEY } from "../../../certs/keys.js";
 import nodemailer from "nodemailer";
@@ -298,6 +300,56 @@ export const verifyEmail = async (token: string) => {
   return;
 };
 
+export const forgotPassword = async (email: string) => {
+  const [user] = await db
+    .select()
+    .from(usersTable)
+    .where(eq(usersTable.email, email))
+    .limit(1);
+
+  if (!user) {
+    throw ApiError.notFound("User doesn't exist");
+  }
+  const ISSUER = process.env.ISSUER!;
+  const resetPasswordToken = createResetPasswordToken({ id: user.id });
+  const resetLink = `${ISSUER}/auth/reset?token=${resetPasswordToken}`;
+
+  await sendMail(
+    "Reset Password Request | Iris",
+    "ressetpassword@shreyxsh.me",
+    email,
+    resetLink,
+    "Reset your password",
+    "Click here to reset password",
+  );
+};
+
+export const resetPassword = async (token: string, newPassword: string) => {
+  const payload = verifyResetPasswordToken(token);
+
+  if (!payload) throw ApiError.badRequest("Invalid or expired link");
+
+  const [user] = await db
+    .select()
+    .from(usersTable)
+    .where(eq(usersTable.id, payload.id));
+
+  if (!user) throw ApiError.notFound("User with that email doesn't exist");
+
+  const salt = randomBytes(32).toString("hex");
+  const hash = createHmac("sha256", salt).update(newPassword).digest("hex");
+
+  await db
+    .update(usersTable)
+    .set({
+      salt: salt,
+      password: hash,
+    })
+    .where(eq(usersTable.id, payload.id));
+
+  return;
+};
+
 export const sendVerificationEmail = async (email: string, link: string) => {
   if (!email) throw ApiError.badRequest("No email provided");
 
@@ -321,5 +373,38 @@ export const sendVerificationEmail = async (email: string, link: string) => {
     to: recipents,
     subject: "Verify Your Email",
     html: `<a href=${link}>Click here to verify</a>`,
+  });
+};
+
+export const sendMail = async (
+  senderName: string,
+  senderEmail: string,
+  recipentemail: string,
+  link: string,
+  subject: string,
+  description?: string,
+) => {
+  if (!recipentemail) throw ApiError.badRequest("No email provided");
+
+  const TOKEN = process.env.SMTP_TOKEN;
+
+  const transport = nodemailer.createTransport(
+    MailtrapTransport({
+      token: TOKEN as string,
+    }),
+  );
+
+  const sender = {
+    address: senderEmail,
+    name: senderName,
+  };
+
+  const recipents = [recipentemail];
+
+  await transport.sendMail({
+    from: sender,
+    to: recipents,
+    subject: subject,
+    html: `<a href=${link}>${description ?? "Click here"}</a>`,
   });
 };
