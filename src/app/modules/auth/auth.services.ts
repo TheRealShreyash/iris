@@ -312,7 +312,7 @@ export const forgotPassword = async (email: string) => {
   }
   const ISSUER = process.env.ISSUER!;
   const resetPasswordToken = createResetPasswordToken({ id: user.id });
-  const resetLink = `${ISSUER}/auth/reset?token=${resetPasswordToken}`;
+  const resetLink = `${ISSUER}/auth/reset-password?token=${resetPasswordToken}`;
 
   await sendMail(
     "Reset Password Request | Iris",

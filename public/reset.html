@@ -1,0 +1,727 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Reset Password — Iris</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Syne:wght@400;500;600;700;800&family=JetBrains+Mono:wght@300;400;500&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      :root {
+        --gold: #e4cc37;
+        --gold-dim: rgba(228, 204, 55, 0.18);
+        --gold-glow: rgba(228, 204, 55, 0.07);
+        --gold-border: rgba(228, 204, 55, 0.22);
+        --green: rgba(110, 220, 130, 0.9);
+        --ink: #080808;
+        --ink3: #161616;
+        --border: rgba(255, 255, 255, 0.07);
+        --border-hi: rgba(255, 255, 255, 0.18);
+        --text: #f2f2f0;
+        --muted: #555550;
+        --muted2: #888880;
+        --serif: "Cormorant Garamond", Georgia, serif;
+        --sans: "Syne", system-ui, sans-serif;
+        --mono: "JetBrains Mono", monospace;
+        --input-bg: rgba(255, 255, 255, 0.03);
+      }
+
+      html {
+        -webkit-text-size-adjust: 100%;
+      }
+      body {
+        min-height: 100svh;
+        font-family: var(--sans);
+        background: var(--ink);
+        color: var(--text);
+        display: flex;
+        align-items: flex-start;
+        justify-content: center;
+        padding: 4rem 1.5rem 6rem;
+        position: relative;
+        overflow-x: hidden;
+      }
+      @media (hover: hover) {
+        body {
+          cursor: none;
+        }
+      }
+      ::selection {
+        background: var(--gold);
+        color: var(--ink);
+      }
+
+      /* ─ Cursor ─ */
+      #cur,
+      #cur-r {
+        position: fixed;
+        z-index: 9999;
+        pointer-events: none;
+        border-radius: 50%;
+        transform: translate(-50%, -50%);
+      }
+      #cur {
+        width: 9px;
+        height: 9px;
+        background: var(--gold);
+        mix-blend-mode: difference;
+        transition:
+          width 0.25s,
+          height 0.25s;
+      }
+      #cur-r {
+        width: 34px;
+        height: 34px;
+        border: 1px solid rgba(228, 204, 55, 0.45);
+        transition:
+          width 0.3s,
+          height 0.3s,
+          opacity 0.3s;
+      }
+      @media (hover: none) {
+        #cur,
+        #cur-r {
+          display: none;
+        }
+      }
+
+      /* ─ Background ─ */
+      .noise {
+        position: fixed;
+        inset: 0;
+        z-index: 0;
+        pointer-events: none;
+        opacity: 0.026;
+        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      }
+      .gridbg {
+        position: fixed;
+        inset: 0;
+        z-index: 0;
+        pointer-events: none;
+        background-image:
+          linear-gradient(rgba(255, 255, 255, 0.022) 1px, transparent 1px),
+          linear-gradient(
+            90deg,
+            rgba(255, 255, 255, 0.022) 1px,
+            transparent 1px
+          );
+        background-size: 62px 62px;
+      }
+      .bgGlow {
+        position: fixed;
+        z-index: 0;
+        pointer-events: none;
+        top: -10%;
+        left: 50%;
+        transform: translateX(-50%);
+        width: min(700px, 100vw);
+        height: 450px;
+        background: radial-gradient(
+          ellipse at 50% 0%,
+          rgba(228, 204, 55, 0.045) 0%,
+          transparent 65%
+        );
+      }
+
+      /* ─ Wrap ─ */
+      .wrap {
+        position: relative;
+        z-index: 1;
+        width: 100%;
+        max-width: 480px;
+        animation: rise 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+      }
+      @keyframes rise {
+        from {
+          opacity: 0;
+          transform: translateY(18px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      /* ─ Wordmark ─ */
+      .wordmark {
+        text-align: center;
+        margin-bottom: 2.6rem;
+      }
+      .wordmark a {
+        font-family: var(--serif);
+        font-weight: 300;
+        font-size: 2.1rem;
+        letter-spacing: 0.35em;
+        text-transform: uppercase;
+        color: #fff;
+        text-decoration: none;
+        position: relative;
+        display: inline-block;
+      }
+      .wordmark a::after {
+        content: "·";
+        color: var(--gold);
+        position: absolute;
+        right: -0.3em;
+        bottom: 0.1em;
+        font-size: 0.42em;
+      }
+      .wordmark p {
+        margin-top: 0.3rem;
+        font-size: 0.62rem;
+        letter-spacing: 0.22em;
+        text-transform: uppercase;
+        color: var(--muted);
+        font-weight: 500;
+      }
+
+      /* ─ Card ─ */
+      .card {
+        background: rgba(255, 255, 255, 0.028);
+        backdrop-filter: blur(28px) saturate(150%);
+        -webkit-backdrop-filter: blur(28px) saturate(150%);
+        border: 1px solid var(--border);
+        border-radius: 2px;
+        padding: 2.8rem 2.8rem;
+        box-shadow:
+          0 0 0 1px rgba(255, 255, 255, 0.02) inset,
+          0 48px 96px rgba(0, 0, 0, 0.7);
+      }
+
+      /* ─ Card head ─ */
+      .card-head {
+        padding-bottom: 2rem;
+        margin-bottom: 2.2rem;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        align-items: flex-start;
+        gap: 1.2rem;
+      }
+      .card-head-icon {
+        width: 48px;
+        height: 48px;
+        flex-shrink: 0;
+        border: 1px solid var(--gold-border);
+        border-radius: 2px;
+        background: var(--gold-glow);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-top: 0.2rem;
+      }
+      .card-head-icon svg {
+        width: 22px;
+        height: 22px;
+      }
+      .card-head-text {
+        flex: 1;
+      }
+      .eyebrow {
+        font-size: 0.62rem;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: var(--gold);
+        margin-bottom: 0.6rem;
+        font-weight: 600;
+        opacity: 0.8;
+      }
+      .card-head h2 {
+        font-family: var(--serif);
+        font-weight: 400;
+        font-size: 1.9rem;
+        line-height: 1.1;
+        color: #fff;
+        letter-spacing: -0.01em;
+      }
+      .card-head h2 em {
+        font-style: italic;
+        font-weight: 300;
+        color: rgba(255, 255, 255, 0.45);
+      }
+      .card-head p {
+        margin-top: 0.5rem;
+        font-size: 0.82rem;
+        color: var(--muted2);
+        line-height: 1.65;
+        font-weight: 400;
+      }
+
+      /* ─ Banners ─ */
+      .error-banner {
+        display: none;
+        background: rgba(255, 80, 80, 0.07);
+        border: 1px solid rgba(255, 80, 80, 0.22);
+        border-left: 3px solid rgba(255, 80, 80, 0.6);
+        border-radius: 2px;
+        padding: 0.72rem 0.9rem;
+        margin-bottom: 1.2rem;
+        font-size: 0.78rem;
+        color: rgba(255, 130, 130, 0.9);
+        animation: rise 0.25s cubic-bezier(0.22, 1, 0.36, 1) both;
+      }
+      .error-banner.visible {
+        display: block;
+      }
+
+      .success-banner {
+        display: none;
+        background: rgba(110, 220, 130, 0.07);
+        border: 1px solid rgba(110, 220, 130, 0.22);
+        border-left: 3px solid rgba(110, 220, 130, 0.55);
+        border-radius: 2px;
+        padding: 0.9rem 1rem;
+        margin-bottom: 0.4rem;
+        font-size: 0.83rem;
+        color: var(--green);
+        line-height: 1.65;
+        animation: rise 0.3s cubic-bezier(0.22, 1, 0.36, 1) both;
+      }
+      .success-banner.visible {
+        display: block;
+      }
+
+      /* ─ Fields ─ */
+      .field {
+        margin-bottom: 1.45rem;
+      }
+      .field-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        margin-bottom: 0.45rem;
+      }
+      .field-top label {
+        font-size: 0.65rem;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--muted2);
+        font-weight: 600;
+      }
+
+      input[type="text"],
+      input[type="email"],
+      input[type="password"] {
+        width: 100%;
+        background: var(--input-bg);
+        border: 1px solid var(--border);
+        border-radius: 2px;
+        padding: 0.75rem 1rem;
+        color: var(--text);
+        font-family: var(--sans);
+        font-size: 0.86rem;
+        font-weight: 400;
+        outline: none;
+        transition:
+          border-color 0.18s,
+          background 0.18s,
+          box-shadow 0.18s;
+        -webkit-appearance: none;
+      }
+      input::placeholder {
+        color: rgba(255, 255, 255, 0.14);
+      }
+      input:focus {
+        border-color: var(--gold-border);
+        background: rgba(228, 204, 55, 0.03);
+        box-shadow: 0 0 0 3px rgba(228, 204, 55, 0.07);
+      }
+
+      .hint {
+        margin-top: 0.4rem;
+        font-size: 0.7rem;
+        color: rgba(255, 255, 255, 0.22);
+        line-height: 1.5;
+        font-weight: 400;
+      }
+
+      /* Live match/mismatch hint under confirm field */
+      .hint.match {
+        color: var(--green);
+      }
+      .hint.mismatch {
+        color: rgba(255, 130, 130, 0.85);
+      }
+
+      /* ─ Button ─ */
+      .btn {
+        width: 100%;
+        padding: 0.92rem 1.5rem;
+        background: var(--gold);
+        border: 1px solid var(--gold);
+        border-radius: 2px;
+        color: var(--ink);
+        font-family: var(--sans);
+        font-size: 0.72rem;
+        font-weight: 700;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        cursor: pointer;
+        transition:
+          background 0.18s,
+          box-shadow 0.18s,
+          transform 0.12s;
+      }
+      .btn:hover {
+        background: #f0d83e;
+        box-shadow: 0 0 32px rgba(228, 204, 55, 0.32);
+        transform: translateY(-1px);
+      }
+      .btn:active {
+        transform: translateY(0);
+      }
+      .btn:disabled {
+        opacity: 0.55;
+        cursor: default;
+        transform: none;
+      }
+
+      /* ─ Foot ─ */
+      .foot {
+        margin-top: 1.5rem;
+        text-align: center;
+        font-size: 0.72rem;
+        color: var(--muted);
+        letter-spacing: 0.03em;
+        line-height: 1.7;
+      }
+      .foot a {
+        color: var(--muted2);
+        text-decoration: none;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        transition:
+          color 0.15s,
+          border-color 0.15s;
+      }
+      .foot a:hover {
+        color: var(--gold);
+        border-color: var(--gold-border);
+      }
+
+      /* ─ Responsive ─ */
+      @media (max-width: 600px) {
+        .wrap {
+          max-width: 100%;
+        }
+        .card {
+          padding: 1.6rem 1.2rem;
+        }
+      }
+      @media (max-width: 380px) {
+        .card {
+          padding: 1.2rem 0.9rem;
+        }
+        .card-head {
+          flex-direction: column;
+          gap: 0.8rem;
+        }
+        .wordmark a {
+          font-size: 1.6rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="cur"></div>
+    <div id="cur-r"></div>
+    <div class="noise" aria-hidden="true"></div>
+    <div class="gridbg" aria-hidden="true"></div>
+    <div class="bgGlow" aria-hidden="true"></div>
+
+    <div class="wrap">
+      <div class="wordmark">
+        <a href="/">Iris</a>
+        <p>Identity &amp; Access Platform</p>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <div class="card-head-icon" aria-hidden="true">
+            <!-- Lock icon -->
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="rgba(228,204,55,.65)"
+              stroke-width="1.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <rect x="5" y="11" width="14" height="9" rx="1.5" />
+              <path d="M8 11V7a4 4 0 018 0v4" />
+            </svg>
+          </div>
+          <div class="card-head-text">
+            <div class="eyebrow">Account Recovery</div>
+            <h2>Reset <em>Password</em></h2>
+            <p>
+              Choose a new password for your account. This link can only be used
+              once.
+            </p>
+          </div>
+        </div>
+
+        <!--
+          STATE: error
+          Reuse this for two distinct cases — keep them visually identical but
+          the message different:
+            (a) the token is missing/invalid/expired on page load (see JS TODO #1)
+            (b) the reset request itself fails on submit (see JS TODO #3)
+        -->
+        <div class="error-banner" id="errorBanner"></div>
+
+        <!--
+          STATE: success
+          Show this after a successful reset, in place of the form (JS TODO #3).
+        -->
+        <div class="success-banner" id="successBanner">
+          Your password has been reset. You can now sign in with your new
+          password.
+        </div>
+
+        <form id="resetForm">
+          <!--
+            Hidden field to carry the token through to the POST body.
+            JS TODO #1 should populate this — see comment in <script> below.
+          -->
+          <input type="hidden" id="token" value="" />
+
+          <div class="field">
+            <div class="field-top">
+              <label for="newPassword">New Password</label>
+            </div>
+            <input
+              type="password"
+              id="newPassword"
+              placeholder="••••••••"
+              minlength="8"
+              required
+            />
+            <div class="hint">Use at least 8 characters.</div>
+          </div>
+
+          <div class="field">
+            <div class="field-top">
+              <label for="confirmPassword">Confirm New Password</label>
+            </div>
+            <input
+              type="password"
+              id="confirmPassword"
+              placeholder="••••••••"
+              minlength="8"
+              required
+            />
+            <!--
+              Optional live feedback target — JS TODO #2 can toggle
+              "match"/"mismatch" classes on this as the user types.
+            -->
+            <div class="hint" id="matchHint"></div>
+          </div>
+
+          <button type="submit" class="btn" id="submitBtn">
+            Reset Password
+          </button>
+        </form>
+      </div>
+
+      <!-- <div class="foot"> -->
+      <!-- Didn't request this? -->
+      <!-- TODO: point this back at the actual sign-in page for this client -->
+      <!-- <a href="/auth/authenticate">Return to sign in</a> and your password stays unchanged. -->
+      <!-- </div> -->
+    </div>
+
+    <script>
+      // ── Cursor (cosmetic only, no wiring needed) ──
+      var cur = document.getElementById("cur"),
+        ring = document.getElementById("cur-r");
+      var mx = window.innerWidth / 2,
+        my = window.innerHeight / 2,
+        rx = mx,
+        ry = my;
+      if (window.matchMedia("(hover:hover)").matches) {
+        document.addEventListener("mousemove", function (e) {
+          mx = e.clientX;
+          my = e.clientY;
+          cur.style.left = mx + "px";
+          cur.style.top = my + "px";
+        });
+        (function a() {
+          rx += (mx - rx) * 0.11;
+          ry += (my - ry) * 0.11;
+          ring.style.left = rx + "px";
+          ring.style.top = ry + "px";
+          requestAnimationFrame(a);
+        })();
+        document.querySelectorAll("a,button").forEach(function (el) {
+          el.addEventListener("mouseenter", function () {
+            ring.style.width = "50px";
+            ring.style.height = "50px";
+            ring.style.opacity = ".5";
+          });
+          el.addEventListener("mouseleave", function () {
+            ring.style.width = "34px";
+            ring.style.height = "34px";
+            ring.style.opacity = "1";
+          });
+        });
+      }
+
+      function showError(msg) {
+        const b = document.getElementById("errorBanner");
+        b.textContent = msg;
+        b.classList.add("visible");
+      }
+      function clearError() {
+        const b = document.getElementById("errorBanner");
+        b.textContent = "";
+        b.classList.remove("visible");
+      }
+
+      /*
+        JS TODO #1 — read the token from the URL on page load:
+
+          const token = new URLSearchParams(window.location.search).get("token");
+
+          - If it's missing entirely, call showError("Invalid or expired link.")
+            and disable #submitBtn (don't bother showing the form at all, or
+            hide #resetForm and just leave the error banner visible).
+          - Otherwise, set document.getElementById("token").value = token
+            so it rides along in the POST body in TODO #3.
+
+          Note: you can optionally also fire a lightweight "is this token
+          still valid" check here for nicer UX (show the error immediately
+          instead of waiting for submit) — but the real validation must still
+          happen server-side in the POST, since this is just a UX nicety.
+      */
+
+      const params = new URLSearchParams(window.location.search);
+      if (!params) {
+        showError("Invalid or expired link.");
+      }
+      const token = params.get("token");
+      if (!token) {
+        showError("No token found");
+      }
+
+      //   document.getElementById("token").value = token;
+
+      /*
+        JS TODO #2 — live password match feedback (optional, nice-to-have):
+
+          Listen for "input" on #confirmPassword, compare its value against
+          #newPassword.value, and toggle "match"/"mismatch" classes plus text
+          on #matchHint accordingly. Purely cosmetic — TODO #3 still needs its
+          own check before submitting.
+      */
+
+      const confirmPasswordField = document.getElementById("confirmPassword");
+      const newPasswordField = document.getElementById("newPassword");
+      const matchHint = document.getElementById("matchHint");
+
+      function checkPasswordMatch() {
+        const password = newPasswordField.value;
+        const confirmPassword = confirmPasswordField.value;
+
+        // If the user hasn't typed anything in the confirmation field yet, keep it clean
+        if (confirmPassword === "") {
+          matchHint.textContent = "";
+          matchHint.className = "hint";
+          return;
+        }
+
+        // Check if they match
+        if (password === confirmPassword) {
+          matchHint.textContent = "✓ Passwords match";
+          matchHint.className = "hint match";
+        } else {
+          matchHint.textContent = "✗ Passwords do not match";
+          matchHint.className = "hint mismatch";
+        }
+      }
+
+      newPasswordField.addEventListener("input", checkPasswordMatch);
+      confirmPasswordField.addEventListener("input", checkPasswordMatch);
+
+      /*
+        JS TODO #3 — handle the actual submit:
+
+        1. Listen for submit on #resetForm, preventDefault(), clearError().
+
+        2. Check document.getElementById("newPassword").value ===
+           document.getElementById("confirmPassword").value.
+           If not, showError("Passwords do not match.") and return early —
+           don't hit the network.
+
+        3. Disable #submitBtn, swap its text to something like "Resetting…".
+
+        4. POST to /auth/reset-password with:
+             {
+               token: document.getElementById("token").value,
+               newPassword: document.getElementById("newPassword").value
+             }
+
+        5. On success: hide #resetForm and add the "visible" class to
+           #successBanner. Consider also redirecting to your sign-in page
+           after a short delay (setTimeout) instead of leaving them here.
+
+        6. On failure (e.g. expired/already-used token): re-enable #submitBtn,
+           restore its text, and call showError(err.message).
+      */
+      const submitButton = document.getElementById("submitBtn"); // Removed the '#'
+      const resetForm = document.getElementById("resetForm");
+      const successBanner = document.getElementById("successBanner");
+      resetForm.addEventListener("submit", async function (e) {
+        try {
+          e.preventDefault();
+          clearError();
+          // TODO: your fetch() call goes here
+
+          if (newPasswordField.value !== confirmPasswordField.value) {
+            return showError("Passwords do not match");
+          }
+
+          submitButton.disabled = true;
+          submitButton.textContent = "Resetting...";
+
+          const res = await fetch("/auth/reset-password", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              token,
+              newPassword: newPasswordField.value,
+            }),
+          });
+
+          const data = await res.json();
+
+          if (!res.ok) {
+            throw new Error(
+              data.message || data.error || "Something went wrong.",
+            );
+          }
+
+          resetForm.style.display = "none";
+          successBanner.classList.add("visible");
+        } catch (error) {
+          showError(error.message);
+          submitButton.disabled = false;
+          submitButton.textContent = "Reset Password";
+        }
+      });
+    </script>
+  </body>
+</html>

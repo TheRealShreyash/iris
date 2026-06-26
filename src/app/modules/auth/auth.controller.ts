@@ -187,7 +187,7 @@ class AuthController {
 
   static async handleResetPassword(req: Request, res: Response) {
     try {
-      const { token, newPassword } = req.query as ResetPasswordPayload;
+      const { token, newPassword } = req.body as ResetPasswordPayload;
       await resetPassword(token, newPassword);
       ApiResponse.ok(res, "Password updated successfully");
     } catch (error) {

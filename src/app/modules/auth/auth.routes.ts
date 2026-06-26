@@ -14,8 +14,10 @@ import {
   authenticate,
   restrictToAuthenticatedUser,
 } from "../../common/middlewares/authenticate.middleware.js";
+import { join } from "node:path";
 
 const authRouter = Router();
+const PUBLIC_DIR = join(process.cwd(), "public");
 
 authRouter.get("/certs", AuthController.handleCerts);
 
@@ -78,7 +80,9 @@ authRouter.post(
   AuthController.handleForgotPassword,
 );
 
-authRouter.get("/reset-password");
+authRouter.get("/reset-password", (_, res) => {
+  res.sendFile(join(PUBLIC_DIR, "reset.html"));
+});
 authRouter.post(
   "/reset-password",
   validate(resetPasswordPayloadModel),
